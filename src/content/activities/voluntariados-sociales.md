@@ -1,0 +1,9 @@
+---
+title: "Voluntariados sociales"
+summary: "Acciones de ayuda social animalista, humanista o ambientalista."
+description: "Coordinamos con asociaciones, centros humanitarios y otros voluntariados de Lima para brindar ayuda social, con la posibilidad de colaborar junto a otras organizaciones."
+cost: "Gratuito"
+modality: "presencial"
+order: 3
+status: "active"
+---

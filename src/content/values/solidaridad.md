@@ -1,0 +1,5 @@
+---
+title: "Solidaridad"
+description: "Promovemos el apoyo mutuo, la cooperación y el acompañamiento entre jóvenes y comunidades."
+order: 8
+---

@@ -1,0 +1,9 @@
+---
+title: "Gincanas deportivas"
+summary: "Actividades físicas y mentales para concientizar sobre la importancia del movimiento."
+description: "Incluyen calentamiento, pausas activas y momentos competitivos grupales e individuales, en ocasiones dirigidas por colaboradores o instituciones. Generalmente los fines de semana."
+cost: "Desde S/ 5 por participante (incluye materiales)"
+modality: "presencial"
+order: 2
+status: "active"
+---

@@ -1,0 +1,5 @@
+---
+title: "Responsabilidad social"
+description: "Nos comprometemos activamente con el bienestar psicológico y el desarrollo de la comunidad."
+order: 7
+---

@@ -1,0 +1,9 @@
+---
+title: "Salidas de integración"
+summary: "Salidas recreativas para integrarnos, entretenernos y relajarnos."
+description: "Definimos juntos el lugar, la fecha y la hora (cine, museo, playa, juegos de mesa y más), generalmente los fines de semana o feriados."
+cost: "Gratuito"
+modality: "presencial"
+order: 5
+status: "active"
+---

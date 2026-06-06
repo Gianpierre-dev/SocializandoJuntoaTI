@@ -1,0 +1,9 @@
+---
+title: "Podcast de desarrollo personal"
+summary: "Próximamente."
+description: "Podcast de desarrollo personal en desarrollo."
+cost: "Gratuito"
+modality: "online"
+order: 9
+status: "in-development"
+---
