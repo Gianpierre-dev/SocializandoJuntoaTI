@@ -1,0 +1,111 @@
+---
+import BaseLayout from "../layouts/base-layout.astro";
+import SectionHeading from "../components/ui/section-heading.astro";
+import VolunteerForm from "../components/forms/volunteer-form.astro";
+import { site } from "../data/site";
+
+const pageTitle = `Voluntariado | ${site.name}`;
+const pageDescription =
+  "Únete al voluntariado de Socializando Junto A Ti. Conoce los requisitos, beneficios y áreas de trabajo para promover el bienestar de la salud mental en jóvenes.";
+---
+
+<BaseLayout title={pageTitle} description={pageDescription}>
+  <!-- Intro -->
+  <section class="bg-white py-16 sm:py-20">
+    <div class="mx-auto max-w-4xl px-4 sm:px-6">
+      <SectionHeading
+        title="Voluntariado"
+        subtitle="Forma parte de nuestro equipo y ayuda a construir espacios seguros para el bienestar emocional de adolescentes y jóvenes."
+      />
+      <p
+        class="mx-auto mt-6 max-w-2xl text-center text-base leading-relaxed text-brand-deep/70 sm:text-lg"
+      >
+        Ser voluntario en {site.name} es una oportunidad para crecer, aprender
+        y generar un impacto positivo en tu comunidad. Te capacitamos mientras
+        participas y reconocemos tu compromiso con la salud mental.
+      </p>
+    </div>
+  </section>
+
+  <!-- Requirements -->
+  <section class="bg-brand/5 py-16 sm:py-20">
+    <div class="mx-auto max-w-4xl px-4 sm:px-6">
+      <SectionHeading
+        title="Requisitos"
+        subtitle="Esto es lo que necesitas para postular como voluntario."
+      />
+
+      <ul class="mx-auto mt-10 grid max-w-3xl gap-4 sm:grid-cols-2">
+        {
+          site.requirements.map((requirement) => (
+            <li class="flex items-start gap-3 rounded-2xl bg-white p-5 shadow-sm">
+              <span
+                class="mt-1 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-bold text-white"
+                aria-hidden="true"
+              >
+                &#10003;
+              </span>
+              <span class="text-base leading-relaxed text-brand-deep/80">
+                {requirement}
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Benefits -->
+  <section class="bg-white py-16 sm:py-20">
+    <div class="mx-auto max-w-4xl px-4 sm:px-6">
+      <SectionHeading
+        title="Beneficios"
+        subtitle="Lo que ganas al sumarte a nuestro voluntariado."
+      />
+      <ul class="mx-auto mt-10 grid max-w-3xl gap-4 sm:grid-cols-2">
+        {
+          site.benefits.map((benefit) => (
+            <li class="flex items-start gap-3 rounded-2xl border border-gold/30 bg-gold/5 p-5">
+              <span
+                class="mt-1 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gold text-sm font-bold text-brand-deep"
+                aria-hidden="true"
+              >
+                &#9733;
+              </span>
+              <span class="text-base leading-relaxed text-brand-deep/80">
+                {benefit}
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Areas -->
+  <section class="bg-brand/5 py-16 sm:py-20">
+    <div class="mx-auto max-w-5xl px-4 sm:px-6">
+      <SectionHeading
+        title="Áreas de trabajo"
+        subtitle="Elige el área donde quieres aportar según tus intereses y habilidades."
+      />
+      <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          site.areas.map((area) => (
+            <article class="flex h-full flex-col rounded-2xl bg-white p-6 shadow-sm">
+              <h3 class="text-lg font-semibold text-brand-deep">
+                {area.title}
+              </h3>
+              <p class="mt-3 text-base leading-relaxed text-brand-deep/70">
+                {area.description}
+              </p>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Application form -->
+  <VolunteerForm />
+</BaseLayout>

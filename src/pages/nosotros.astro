@@ -1,0 +1,90 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/base-layout.astro";
+import { site } from "../data/site";
+import SectionHeading from "../components/ui/section-heading.astro";
+import TeamGrid from "../components/sections/team-grid.astro";
+import AlliesStrip from "../components/sections/allies-strip.astro";
+
+const values = (await getCollection("values")).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+
+const pageTitle = `Nosotros | ${site.name}`;
+const pageDescription =
+  "Conoce nuestra misión, visión y los valores que guían a Socializando Junto A Ti, una organización juvenil dedicada al bienestar de la salud mental de adolescentes y jóvenes.";
+---
+
+<BaseLayout title={pageTitle} description={pageDescription}>
+  <!-- Intro -->
+  <section class="bg-white py-16 sm:py-20">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      <SectionHeading
+        title="Nosotros"
+        subtitle={`${site.name} es una organización juvenil fundada el ${site.foundedDate}, dedicada a ${site.audience.toLowerCase()}.`}
+      />
+    </div>
+  </section>
+
+  <!-- Mission and Vision -->
+  <section class="bg-brand/5 py-16 sm:py-20">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      <div class="grid gap-8 md:grid-cols-2">
+        <article class="rounded-2xl border border-brand/10 bg-white p-8 shadow-sm">
+          <h2 class="text-2xl font-semibold text-brand">Misión</h2>
+          <p class="mt-4 text-base leading-relaxed text-brand-deep/80">
+            {site.mission}
+          </p>
+        </article>
+        <article class="rounded-2xl border border-gold/20 bg-white p-8 shadow-sm">
+          <h2 class="text-2xl font-semibold text-gold">Visión</h2>
+          <p class="mt-4 text-base leading-relaxed text-brand-deep/80">
+            {site.vision}
+          </p>
+        </article>
+      </div>
+
+      <article class="mt-8 rounded-2xl border border-brand/10 bg-white p-8 shadow-sm">
+        <h2 class="text-2xl font-semibold text-brand-deep">Objetivo</h2>
+        <p class="mt-4 text-base leading-relaxed text-brand-deep/80">
+          {site.objective}
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <!-- Values -->
+  <section class="bg-white py-16 sm:py-20">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      <SectionHeading
+        title="Nuestros valores"
+        subtitle="Los principios que guían cada actividad y cada encuentro."
+      />
+
+      {
+        values.length > 0 ? (
+          <ul class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {values.map((value) => (
+              <li class="rounded-xl border border-brand/10 bg-brand/5 p-6 shadow-sm">
+                <h3 class="font-semibold text-brand-deep">{value.data.title}</h3>
+                <p class="mt-2 text-sm leading-relaxed text-brand-deep/70">
+                  {value.data.description}
+                </p>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p class="mt-12 text-center text-brand-deep/60">
+            Pronto compartiremos nuestros valores.
+          </p>
+        )
+      }
+    </div>
+  </section>
+
+  <!-- Team -->
+  <TeamGrid />
+
+  <!-- Allies -->
+  <AlliesStrip />
+</BaseLayout>
