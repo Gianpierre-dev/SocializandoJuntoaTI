@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+@theme {
+  /* Brand color tokens (from logo) */
+  --color-brand: #4a3f88; /* main purple */
+  --color-brand-deep: #2c2a5e; /* dark purple-blue, dark backgrounds */
+  --color-gold: #c39a2b; /* gold, accents and CTAs */
+  --color-rose: #d488b1; /* soft pink */
+  --color-green: #6fa088; /* green */
+
+  /* Typography */
+  --font-heading: "Poppins", system-ui, sans-serif;
+  --font-body: "Source Sans 3", system-ui, sans-serif;
+}
+
+html {
+  font-family: var(--font-body);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+}

@@ -1,0 +1,23 @@
+# build output
+dist/
+
+# generated types
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# NOTE: .env is intentionally committed (single-developer project convention).
+
+# tooling / local agent artifacts
+.atl/
+.playwright-mcp/
+
+# macOS / editors
+.DS_Store
