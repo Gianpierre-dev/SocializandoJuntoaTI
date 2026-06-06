@@ -1,0 +1,50 @@
+---
+import { getCollection } from "astro:content";
+import SectionHeading from "../ui/section-heading.astro";
+
+const team = (await getCollection("team")).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+
+const getInitial = (name: string) =>
+  name.trim().charAt(0).toUpperCase() || "?";
+---
+
+<section class="bg-white py-16 sm:py-20">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <SectionHeading
+      title="Nuestro equipo"
+      subtitle="Personas comprometidas con el bienestar emocional de la comunidad."
+    />
+
+    {
+      team.length > 0 ? (
+        <ul class="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          {team.map((member) => (
+            <li class="flex flex-col items-center text-center">
+              <div
+                class="flex h-24 w-24 items-center justify-center rounded-full bg-brand/10 text-3xl font-semibold text-brand"
+                aria-hidden="true"
+              >
+                {getInitial(member.data.name)}
+              </div>
+              <h3 class="mt-4 font-semibold text-brand-deep">
+                {member.data.name}
+              </h3>
+              <p class="text-sm text-brand">{member.data.role}</p>
+              {member.data.handle && (
+                <p class="mt-1 text-sm text-brand-deep/60">
+                  {member.data.handle}
+                </p>
+              )}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="mt-12 text-center text-brand-deep/60">
+          Pronto conocerás a nuestro equipo.
+        </p>
+      )
+    }
+  </div>
+</section>

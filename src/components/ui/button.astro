@@ -1,0 +1,24 @@
+---
+interface Props {
+  href: string;
+  variant?: "primary" | "gold" | "ghost";
+  label: string;
+}
+
+const { href, variant = "primary", label } = Astro.props;
+
+const base =
+  "inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white";
+
+const variants: Record<NonNullable<Props["variant"]>, string> = {
+  primary:
+    "bg-brand text-white hover:bg-brand-deep focus-visible:ring-brand",
+  gold: "bg-gold text-brand-deep hover:bg-gold/90 focus-visible:ring-gold",
+  ghost:
+    "border border-brand text-brand hover:bg-brand hover:text-white focus-visible:ring-brand",
+};
+---
+
+<a href={href} class={`${base} ${variants[variant]}`}>
+  {label}
+</a>

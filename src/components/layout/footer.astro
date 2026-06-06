@@ -1,0 +1,121 @@
+---
+import { Image } from "astro:assets";
+import logo from "../../assets/logo.png";
+import { site } from "../../data/site";
+
+const navLinks = [
+  { label: "Inicio", href: "/" },
+  { label: "Nosotros", href: "/nosotros" },
+  { label: "Actividades", href: "/actividades" },
+  { label: "Voluntariado", href: "/voluntariado" },
+  { label: "Contacto", href: "/contacto" },
+];
+
+const socialLinks = [
+  { label: "Instagram", href: site.socials.instagram },
+  { label: "TikTok", href: site.socials.tiktok },
+  { label: "Facebook", href: site.socials.facebook },
+  { label: "WhatsApp", href: site.socials.whatsapp },
+].filter((link) => link.href);
+
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="border-t border-white/10 bg-brand-deep text-white/80">
+  <div class="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+    <div class="grid gap-10 md:grid-cols-3">
+      <!-- Brand -->
+      <div>
+        <a
+          href="/"
+          class="flex items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+          aria-label={`${site.name} - Inicio`}
+        >
+          <Image
+            src={logo}
+            alt={`Logo de ${site.name}`}
+            width={48}
+            height={48}
+            class="h-12 w-12 object-contain"
+          />
+          <span class="text-base font-semibold text-white">{site.name}</span>
+        </a>
+        {
+          site.slogan && (
+            <p class="mt-4 max-w-xs text-sm leading-relaxed text-white/70">
+              {site.slogan}
+            </p>
+          )
+        }
+      </div>
+
+      <!-- Navigation -->
+      <nav aria-label="Navegación del pie de página">
+        <h2 class="text-sm font-semibold uppercase tracking-wide text-white">
+          Navegación
+        </h2>
+        <ul class="mt-4 space-y-2">
+          {
+            navLinks.map((link) => (
+              <li>
+                <a
+                  href={link.href}
+                  class="rounded text-sm text-white/70 transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <!-- Social + locations -->
+      <div>
+        <h2 class="text-sm font-semibold uppercase tracking-wide text-white">
+          Síguenos
+        </h2>
+        {
+          socialLinks.length > 0 && (
+            <ul class="mt-4 space-y-2">
+              {socialLinks.map((link) => (
+                <li>
+                  <a
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="rounded text-sm text-white/70 transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )
+        }
+
+        {
+          site.locations.length > 0 && (
+            <div class="mt-6">
+              <h2 class="text-sm font-semibold uppercase tracking-wide text-white">
+                Ubicaciones
+              </h2>
+              <ul class="mt-4 space-y-2">
+                {site.locations.map((location) => (
+                  <li class="text-sm text-white/70">{location}</li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+      </div>
+    </div>
+
+    <div
+      class="mt-10 flex flex-col gap-2 border-t border-white/10 pt-6 text-sm text-white/60 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <p>&copy; {currentYear} {site.name}. Todos los derechos reservados.</p>
+      {site.slogan && <p class="text-gold">{site.slogan}</p>}
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,51 @@
+---
+interface Props {
+  title: string;
+  summary: string;
+  description?: string;
+  cost: string;
+  modality: "presencial" | "online" | "mixto";
+  status: "active" | "in-development";
+}
+
+const { title, summary, cost, modality, status } = Astro.props;
+
+const modalityLabels: Record<Props["modality"], string> = {
+  presencial: "Presencial",
+  online: "En línea",
+  mixto: "Mixto",
+};
+
+const isComingSoon = status === "in-development";
+---
+
+<article
+  class={`flex h-full flex-col rounded-2xl border border-brand/10 bg-white p-6 shadow-sm transition-shadow duration-200 hover:shadow-md ${
+    isComingSoon ? "opacity-70" : ""
+  }`}
+>
+  <div class="mb-3 flex flex-wrap items-center gap-2">
+    <span
+      class="rounded-full bg-green/15 px-3 py-1 text-xs font-semibold text-green"
+    >
+      {modalityLabels[modality]}
+    </span>
+    {
+      isComingSoon && (
+        <span class="rounded-full bg-gold/15 px-3 py-1 text-xs font-semibold text-gold">
+          Próximamente
+        </span>
+      )
+    }
+  </div>
+
+  <h3 class="text-lg font-semibold text-brand-deep">{title}</h3>
+  <p class="mt-2 flex-1 text-sm leading-relaxed text-brand-deep/70">
+    {summary}
+  </p>
+
+  <p class="mt-4 text-sm font-medium text-brand">
+    <span class="text-brand-deep/50">Costo:</span>
+    {cost}
+  </p>
+</article>

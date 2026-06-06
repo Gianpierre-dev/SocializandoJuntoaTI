@@ -1,0 +1,62 @@
+---
+import { getCollection } from "astro:content";
+import SectionHeading from "../ui/section-heading.astro";
+import ActivityCard from "../ui/activity-card.astro";
+import Button from "../ui/button.astro";
+
+interface Props {
+  limit?: number;
+}
+
+const { limit } = Astro.props;
+
+const activities = (await getCollection("activities")).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+
+const visibleActivities =
+  typeof limit === "number" ? activities.slice(0, limit) : activities;
+
+const hasMore = typeof limit === "number" && activities.length > limit;
+---
+
+<section class="bg-brand/5 py-16 sm:py-20">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <SectionHeading
+      title="Nuestras actividades"
+      subtitle="Espacios pensados para conectar, aprender y cuidar la salud emocional."
+    />
+
+    {
+      visibleActivities.length > 0 ? (
+        <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {visibleActivities.map((activity) => (
+            <ActivityCard
+              title={activity.data.title}
+              summary={activity.data.summary}
+              cost={activity.data.cost}
+              modality={activity.data.modality}
+              status={activity.data.status}
+            />
+          ))}
+        </div>
+      ) : (
+        <p class="mt-12 text-center text-brand-deep/60">
+          Pronto publicaremos nuestras actividades.
+        </p>
+      )
+    }
+
+    {
+      hasMore && (
+        <div class="mt-10 text-center">
+          <Button
+            href="/actividades"
+            variant="primary"
+            label="Ver todas las actividades"
+          />
+        </div>
+      )
+    }
+  </div>
+</section>

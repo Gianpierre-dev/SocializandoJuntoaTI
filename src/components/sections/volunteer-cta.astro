@@ -1,0 +1,33 @@
+---
+import { site } from "../../data/site";
+import Button from "../ui/button.astro";
+
+const previewRequirements = site.requirements.slice(0, 4);
+const formHref = "/voluntariado#postular";
+---
+
+<section class="bg-brand-deep py-16 text-white sm:py-20">
+  <div class="mx-auto max-w-4xl px-4 text-center sm:px-6">
+    <h2 class="text-3xl font-bold sm:text-4xl">Sé parte del cambio</h2>
+    <p class="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-white/80 sm:text-lg">
+      Únete como voluntario y ayuda a construir espacios seguros para el
+      bienestar emocional de más jóvenes.
+    </p>
+
+    {
+      previewRequirements.length > 0 && (
+        <ul class="mx-auto mt-8 flex max-w-2xl flex-wrap justify-center gap-3">
+          {previewRequirements.map((requirement) => (
+            <li class="rounded-full bg-white/10 px-4 py-2 text-sm text-white/90">
+              {requirement}
+            </li>
+          ))}
+        </ul>
+      )
+    }
+
+    <div class="mt-10">
+      <Button href={formHref} variant="gold" label="Quiero ser voluntario" />
+    </div>
+  </div>
+</section>
