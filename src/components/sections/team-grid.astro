@@ -10,7 +10,7 @@ const getInitial = (name: string) =>
   name.trim().charAt(0).toUpperCase() || "?";
 ---
 
-<section class="bg-white py-16 sm:py-20">
+<section class="bg-surface py-16 sm:py-20">
   <div class="mx-auto max-w-6xl px-4 sm:px-6">
     <SectionHeading
       title="Nuestro equipo"
@@ -23,17 +23,17 @@ const getInitial = (name: string) =>
           {team.map((member) => (
             <li class="flex flex-col items-center text-center">
               <div
-                class="flex h-24 w-24 items-center justify-center rounded-full bg-brand/10 text-3xl font-semibold text-brand"
+                class="flex h-24 w-24 items-center justify-center rounded-full bg-brand/10 text-3xl font-semibold text-accent"
                 aria-hidden="true"
               >
                 {getInitial(member.data.name)}
               </div>
-              <h3 class="mt-4 font-semibold text-brand-deep">
+              <h3 class="mt-4 font-semibold text-content">
                 {member.data.name}
               </h3>
-              <p class="text-sm text-brand">{member.data.role}</p>
+              <p class="text-sm text-accent">{member.data.role}</p>
               {member.data.handle && (
-                <p class="mt-1 text-sm text-brand-deep/60">
+                <p class="mt-1 text-sm text-content/60">
                   {member.data.handle}
                 </p>
               )}
@@ -41,7 +41,7 @@ const getInitial = (name: string) =>
           ))}
         </ul>
       ) : (
-        <p class="mt-12 text-center text-brand-deep/60">
+        <p class="mt-12 text-center text-content/60">
           Pronto conocerás a nuestro equipo.
         </p>
       )

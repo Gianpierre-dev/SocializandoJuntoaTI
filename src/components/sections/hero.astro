@@ -6,26 +6,26 @@ import Button from "../ui/button.astro";
 ---
 
 <section
-  class="relative overflow-hidden bg-gradient-to-b from-brand/5 via-rose/5 to-white"
+  class="relative overflow-hidden bg-gradient-to-b from-subtle via-subtle to-page"
 >
   <div
     class="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 sm:px-6 md:grid-cols-2 md:py-24"
   >
     <div class="text-center md:text-left">
       <p
-        class="text-sm font-semibold uppercase tracking-wide text-brand"
+        class="text-sm font-semibold uppercase tracking-wide text-accent"
       >
         {site.name}
       </p>
       <h1
-        class="mt-4 text-4xl font-bold leading-tight text-brand-deep sm:text-5xl"
+        class="mt-4 text-4xl font-bold leading-tight text-content sm:text-5xl"
       >
         {site.slogan || "Construimos espacios de bienestar emocional juvenil"}
       </h1>
       {
         site.mission && (
           <p
-            class="mx-auto mt-6 max-w-xl text-base leading-relaxed text-brand-deep/70 sm:text-lg md:mx-0"
+            class="mx-auto mt-6 max-w-xl text-base leading-relaxed text-content/70 sm:text-lg md:mx-0"
           >
             {site.mission}
           </p>

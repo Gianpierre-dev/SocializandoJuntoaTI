@@ -11,14 +11,14 @@ const pageDescription =
 
 <BaseLayout title={pageTitle} description={pageDescription}>
   <!-- Intro -->
-  <section class="bg-white py-16 sm:py-20">
+  <section class="bg-surface py-16 sm:py-20">
     <div class="mx-auto max-w-4xl px-4 sm:px-6">
       <SectionHeading
         title="Voluntariado"
         subtitle="Forma parte de nuestro equipo y ayuda a construir espacios seguros para el bienestar emocional de adolescentes y jóvenes."
       />
       <p
-        class="mx-auto mt-6 max-w-2xl text-center text-base leading-relaxed text-brand-deep/70 sm:text-lg"
+        class="mx-auto mt-6 max-w-2xl text-center text-base leading-relaxed text-content/70 sm:text-lg"
       >
         Ser voluntario en {site.name} es una oportunidad para crecer, aprender
         y generar un impacto positivo en tu comunidad. Te capacitamos mientras
@@ -28,7 +28,7 @@ const pageDescription =
   </section>
 
   <!-- Requirements -->
-  <section class="bg-brand/5 py-16 sm:py-20">
+  <section class="bg-subtle py-16 sm:py-20">
     <div class="mx-auto max-w-4xl px-4 sm:px-6">
       <SectionHeading
         title="Requisitos"
@@ -38,14 +38,14 @@ const pageDescription =
       <ul class="mx-auto mt-10 grid max-w-3xl gap-4 sm:grid-cols-2">
         {
           site.requirements.map((requirement) => (
-            <li class="flex items-start gap-3 rounded-2xl bg-white p-5 shadow-sm">
+            <li class="flex items-start gap-3 rounded-2xl bg-surface p-5 shadow-sm">
               <span
                 class="mt-1 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-bold text-white"
                 aria-hidden="true"
               >
                 &#10003;
               </span>
-              <span class="text-base leading-relaxed text-brand-deep/80">
+              <span class="text-base leading-relaxed text-content/80">
                 {requirement}
               </span>
             </li>
@@ -56,7 +56,7 @@ const pageDescription =
   </section>
 
   <!-- Benefits -->
-  <section class="bg-white py-16 sm:py-20">
+  <section class="bg-surface py-16 sm:py-20">
     <div class="mx-auto max-w-4xl px-4 sm:px-6">
       <SectionHeading
         title="Beneficios"
@@ -72,7 +72,7 @@ const pageDescription =
               >
                 &#9733;
               </span>
-              <span class="text-base leading-relaxed text-brand-deep/80">
+              <span class="text-base leading-relaxed text-content/80">
                 {benefit}
               </span>
             </li>
@@ -83,7 +83,7 @@ const pageDescription =
   </section>
 
   <!-- Areas -->
-  <section class="bg-brand/5 py-16 sm:py-20">
+  <section class="bg-subtle py-16 sm:py-20">
     <div class="mx-auto max-w-5xl px-4 sm:px-6">
       <SectionHeading
         title="Áreas de trabajo"
@@ -92,11 +92,11 @@ const pageDescription =
       <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {
           site.areas.map((area) => (
-            <article class="flex h-full flex-col rounded-2xl bg-white p-6 shadow-sm">
-              <h3 class="text-lg font-semibold text-brand-deep">
+            <article class="flex h-full flex-col rounded-2xl bg-surface p-6 shadow-sm">
+              <h3 class="text-lg font-semibold text-content">
                 {area.title}
               </h3>
-              <p class="mt-3 text-base leading-relaxed text-brand-deep/70">
+              <p class="mt-3 text-base leading-relaxed text-content/70">
                 {area.description}
               </p>
             </article>

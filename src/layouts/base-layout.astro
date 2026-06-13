@@ -18,6 +18,18 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? Astro.url);
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Apply the saved theme before paint to avoid a flash of the wrong mode. -->
+    <script is:inline>
+      (function () {
+        const stored = localStorage.getItem("theme");
+        const prefersDark = window.matchMedia(
+          "(prefers-color-scheme: dark)",
+        ).matches;
+        const dark = stored ? stored === "dark" : prefersDark;
+        document.documentElement.classList.toggle("dark", dark);
+      })();
+    </script>
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="180x180" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/favicon.png" />
@@ -48,7 +60,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? Astro.url);
       rel="stylesheet"
     />
   </head>
-  <body class="flex min-h-screen flex-col bg-white text-brand-deep antialiased">
+  <body class="flex min-h-screen flex-col bg-page text-content antialiased">
     <a
       href="#main-content"
       class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-brand focus:px-4 focus:py-2 focus:text-white"

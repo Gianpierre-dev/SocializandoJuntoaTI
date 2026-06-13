@@ -9,7 +9,7 @@ const allies = (await getCollection("allies")).sort(
 
 {
   allies.length > 0 && (
-    <section class="bg-brand/5 py-16 sm:py-20">
+    <section class="bg-subtle py-16 sm:py-20">
       <div class="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading
           title="Aliados"
@@ -20,11 +20,11 @@ const allies = (await getCollection("allies")).sort(
           {allies.map((ally) => {
             const content = (
               <span class="block text-center">
-                <span class="block font-semibold text-brand-deep">
+                <span class="block font-semibold text-content">
                   {ally.data.name}
                 </span>
                 {ally.data.handle && (
-                  <span class="block text-sm text-brand-deep/60">
+                  <span class="block text-sm text-content/60">
                     {ally.data.handle}
                   </span>
                 )}
@@ -38,12 +38,12 @@ const allies = (await getCollection("allies")).sort(
                     href={ally.data.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="block rounded-2xl border border-brand/10 bg-white px-6 py-4 shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                    class="block rounded-2xl border border-line bg-surface px-6 py-4 shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                   >
                     {content}
                   </a>
                 ) : (
-                  <div class="rounded-2xl border border-brand/10 bg-white px-6 py-4 shadow-sm">
+                  <div class="rounded-2xl border border-line bg-surface px-6 py-4 shadow-sm">
                     {content}
                   </div>
                 )}

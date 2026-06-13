@@ -1,20 +1,50 @@
 @import "tailwindcss";
 
+/* Manual dark mode: the `dark:` variant applies when <html> has the .dark class. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
-  /* Brand color tokens (from logo) */
-  --color-brand: #4a3f88; /* main purple */
-  --color-brand-deep: #2c2a5e; /* dark purple-blue, dark backgrounds */
-  --color-gold: #c39a2b; /* gold, accents and CTAs */
+  /* Brand accents (fixed) */
+  --color-brand: #4a3f88; /* main purple — button backgrounds */
+  --color-brand-deep: #2c2a5e; /* dark anchor — dark sections, footer */
+  --color-gold: #c39a2b; /* gold — CTAs and accents */
   --color-rose: #d488b1; /* soft pink */
   --color-green: #6fa088; /* green */
+
+  /* Accent text (flips in dark for legibility) */
+  --color-accent: #4a3f88;
+
+  /* Semantic surface tokens (flip with .dark — overrides below) */
+  --color-page: #ffffff; /* page background */
+  --color-surface: #ffffff; /* cards, header */
+  --color-subtle: #f5f3fb; /* alternating sections */
+  --color-content: #2c2a5e; /* primary text */
+  --color-line: #e6e2f0; /* borders */
 
   /* Typography */
   --font-heading: "Poppins", system-ui, sans-serif;
   --font-body: "Source Sans 3", system-ui, sans-serif;
 }
 
+/* Dark palette: flip the semantic tokens and lift the accent for contrast. */
+.dark {
+  --color-accent: #b3a7ec;
+  --color-page: #121127;
+  --color-surface: #1e1c3e;
+  --color-subtle: #191832;
+  --color-content: #e9e7f6;
+  --color-line: #34315c;
+}
+
 html {
   font-family: var(--font-body);
+  background-color: var(--color-page);
+  color: var(--color-content);
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
 }
 
 h1,
