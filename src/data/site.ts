@@ -56,7 +56,8 @@ export const site: Site = {
     whatsapp: "#",
   },
   volunteerForm: "#",
-  // Paste here the Google Apps Script Web App URL (see docs/integraciones/apps-script-inscripciones.gs).
+  // Paste the Google Apps Script Web App URL here (ends in /exec).
+  // See docs/integraciones/apps-script-inscripciones.gs for setup.
   volunteerEndpoint: "",
   requirements: [
     "Ser estudiante o egresado entre los 18 y 35 años.",
