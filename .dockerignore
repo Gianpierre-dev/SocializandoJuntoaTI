@@ -1,0 +1,10 @@
+node_modules
+dist
+.astro
+.git
+.github
+.atl
+.playwright-mcp
+*.pdf
+Wireframe-Home-SOJAT.png
+.env
