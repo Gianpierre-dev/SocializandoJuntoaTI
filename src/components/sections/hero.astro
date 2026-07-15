@@ -3,80 +3,186 @@ import { Image } from "astro:assets";
 import logo from "../../assets/logo.png";
 import { site } from "../../data/site";
 import Button from "../ui/button.astro";
+
+interface Slide {
+  id: string;
+  label: string;
+}
+
+const slides: Slide[] = [
+  { id: "banner-slogan", label: "Presentación" },
+  { id: "banner-voluntariado", label: "Convocatoria de voluntariado" },
+  { id: "banner-actividades", label: "Actividades" },
+];
 ---
 
-<section class="relative overflow-hidden bg-brand-deep text-white">
-  <!-- Patrón decorativo de fondo -->
-  <div
-    class="pointer-events-none absolute inset-0 opacity-10"
-    aria-hidden="true"
-  >
-    <svg class="h-full w-full" preserveAspectRatio="xMidYMid slice">
-      <defs>
-        <pattern
-          id="hero-dots"
-          width="28"
-          height="28"
-          patternUnits="userSpaceOnUse"
-        >
-          <circle cx="2" cy="2" r="1.5" fill="currentColor"></circle>
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#hero-dots)"></rect>
-    </svg>
-  </div>
-  <div
-    class="pointer-events-none absolute -right-32 -top-32 h-96 w-96 rounded-full bg-brand opacity-40 blur-3xl"
-    aria-hidden="true"
-  >
-  </div>
-
-  <div
-    class="relative mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 sm:px-6 md:grid-cols-2 md:py-24"
-  >
-    <div class="text-center md:text-left">
-      <p
-        class="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-gold ring-1 ring-white/20"
-      >
-        {site.name} · Desde {site.foundedDate}
-      </p>
-      <h1
-        class="mt-5 text-4xl font-bold leading-tight text-white sm:text-5xl"
-      >
-        {site.slogan || "Construimos espacios de bienestar emocional juvenil"}
-      </h1>
-      {
-        site.objective && (
-          <p class="mx-auto mt-6 max-w-xl text-base leading-relaxed text-white/80 sm:text-lg md:mx-0">
-            {site.objective}
-          </p>
-        )
-      }
-
+<section
+  class="bg-page py-6"
+  aria-roledescription="carrusel"
+  aria-label="Banners destacados"
+>
+  <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <div
+      id="hero-carousel"
+      class="flex snap-x snap-mandatory overflow-x-auto scroll-smooth rounded-xl shadow-md [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+    >
+      <!-- Banner 1: presentación -->
       <div
-        class="mt-8 flex flex-col items-center gap-3 sm:flex-row md:items-start md:justify-start"
+        id="banner-slogan"
+        class="grid w-full shrink-0 snap-center items-center gap-6 bg-brand px-8 py-12 text-white sm:grid-cols-[1fr_auto] sm:px-14 sm:py-16"
+        role="group"
+        aria-roledescription="banner"
+        aria-label="1 de 3"
       >
-        <Button href="/voluntariado" variant="gold" label="Sé voluntario" />
+        <div>
+          <p class="text-xs font-bold uppercase tracking-widest text-gold">
+            {site.name}
+          </p>
+          <p class="mt-3 text-3xl font-bold leading-tight sm:text-4xl">
+            {site.slogan}
+          </p>
+          <p class="mt-4 max-w-xl text-sm text-white/80 sm:text-base">
+            Promovemos el cuidado de la salud mental en adolescentes y jóvenes
+            desde el {site.foundedDate}.
+          </p>
+        </div>
+        <div class="hidden sm:block">
+          <div
+            class="flex h-40 w-40 items-center justify-center rounded-full bg-white/90 p-5"
+          >
+            <Image
+              src={logo}
+              alt=""
+              width={160}
+              height={160}
+              class="h-full w-full object-contain"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Banner 2: convocatoria de voluntariado -->
+      <div
+        id="banner-voluntariado"
+        class="grid w-full shrink-0 snap-center items-center gap-6 bg-gold px-8 py-12 text-brand-deep sm:grid-cols-[1fr_auto] sm:px-14 sm:py-16"
+        role="group"
+        aria-roledescription="banner"
+        aria-label="2 de 3"
+      >
+        <div>
+          <p class="text-xs font-bold uppercase tracking-widest">
+            Convocatoria abierta
+          </p>
+          <p class="mt-3 text-3xl font-bold leading-tight sm:text-4xl">
+            Programa de Voluntariado Juvenil
+          </p>
+          <p class="mt-4 max-w-xl text-sm sm:text-base">
+            Si tienes entre 18 y 35 años y te interesa la salud mental, esta
+            es tu oportunidad de generar impacto.
+          </p>
+        </div>
+        <Button href="/voluntariado" variant="primary" label="Postula aquí" />
+      </div>
+
+      <!-- Banner 3: actividades -->
+      <div
+        id="banner-actividades"
+        class="grid w-full shrink-0 snap-center items-center gap-6 bg-green px-8 py-12 text-white sm:grid-cols-[1fr_auto] sm:px-14 sm:py-16"
+        role="group"
+        aria-roledescription="banner"
+        aria-label="3 de 3"
+      >
+        <div>
+          <p class="text-xs font-bold uppercase tracking-widest">
+            Talleres y dinámicas
+          </p>
+          <p class="mt-3 text-3xl font-bold leading-tight sm:text-4xl">
+            Actividades en los parques de Lima
+          </p>
+          <p class="mt-4 max-w-xl text-sm text-white/90 sm:text-base">
+            {site.locations.join(" · ")}
+          </p>
+        </div>
         <Button
           href="/actividades"
           variant="outline-light"
-          label="Conoce las actividades"
+          label="Ver actividades"
         />
       </div>
     </div>
 
-    <div class="flex justify-center md:justify-end">
-      <div
-        class="flex h-56 w-56 items-center justify-center rounded-full bg-white/90 p-8 shadow-2xl ring-4 ring-white/20 sm:h-72 sm:w-72"
-      >
-        <Image
-          src={logo}
-          alt={`Logo de ${site.name}`}
-          width={288}
-          height={288}
-          class="h-full w-full object-contain"
-        />
-      </div>
+    <!-- Indicadores -->
+    <div class="mt-4 flex justify-center gap-2" role="tablist">
+      {
+        slides.map((slide, index) => (
+          <button
+            type="button"
+            class="hero-dot h-3 w-3 rounded-full bg-line transition-colors hover:bg-brand/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand data-[active]:bg-brand"
+            data-target={slide.id}
+            data-active={index === 0 ? "" : undefined}
+            aria-label={`Ir al banner: ${slide.label}`}
+          />
+        ))
+      }
     </div>
   </div>
 </section>
+
+<script>
+  const carousel = document.getElementById("hero-carousel");
+  const dots = Array.from(
+    document.querySelectorAll<HTMLButtonElement>(".hero-dot"),
+  );
+
+  if (carousel && dots.length > 0) {
+    let index = 0;
+    let timer: number | undefined;
+
+    const goTo = (i: number) => {
+      index = (i + dots.length) % dots.length;
+      carousel.scrollTo({
+        left: carousel.clientWidth * index,
+        behavior: "smooth",
+      });
+    };
+
+    const syncDots = () => {
+      const current = Math.round(carousel.scrollLeft / carousel.clientWidth);
+      dots.forEach((dot, i) => {
+        if (i === current) dot.setAttribute("data-active", "");
+        else dot.removeAttribute("data-active");
+      });
+      index = current;
+    };
+
+    const startAuto = () => {
+      stopAuto();
+      // Respeta la preferencia de movimiento reducido.
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+        return;
+      timer = window.setInterval(() => goTo(index + 1), 6000);
+    };
+
+    const stopAuto = () => {
+      if (timer) window.clearInterval(timer);
+      timer = undefined;
+    };
+
+    dots.forEach((dot, i) => {
+      dot.addEventListener("click", () => {
+        goTo(i);
+        startAuto();
+      });
+    });
+
+    carousel.addEventListener("scroll", () => {
+      window.requestAnimationFrame(syncDots);
+    });
+    carousel.addEventListener("pointerenter", stopAuto);
+    carousel.addEventListener("pointerleave", startAuto);
+    carousel.addEventListener("focusin", stopAuto);
+    carousel.addEventListener("focusout", startAuto);
+
+    startAuto();
+  }
+</script>

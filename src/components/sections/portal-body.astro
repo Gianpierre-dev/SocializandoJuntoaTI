@@ -1,0 +1,122 @@
+---
+// Cuerpo tipo portal institucional: destacado + notas de prensa a la izquierda,
+// mosaico de accesos a programas a la derecha.
+import { site } from "../../data/site";
+
+interface Tile {
+  title: string;
+  subtitle: string;
+  href: string;
+  classes: string;
+}
+
+const tiles: Tile[] = [
+  {
+    title: "Voluntariado",
+    subtitle: "Convocatoria abierta",
+    href: "/voluntariado",
+    classes: "bg-brand text-white",
+  },
+  {
+    title: "Actividades",
+    subtitle: "Talleres y dinámicas",
+    href: "/actividades",
+    classes: "bg-gold text-brand-deep",
+  },
+  {
+    title: "Áreas de trabajo",
+    subtitle: "6 equipos de voluntariado",
+    href: "/voluntariado#areas",
+    classes: "bg-rose text-brand-deep",
+  },
+  {
+    title: "Nosotros",
+    subtitle: "Misión, visión y equipo",
+    href: "/nosotros",
+    classes: "bg-green text-white",
+  },
+  {
+    title: "Noticias",
+    subtitle: "Notas y convocatorias",
+    href: "/blog",
+    classes: "bg-brand-deep text-white",
+  },
+  {
+    title: "Contacto",
+    subtitle: "Alianzas y consultas",
+    href: "/contacto",
+    classes: "bg-subtle text-accent ring-1 ring-line",
+  },
+];
+---
+
+<section class="bg-page pb-16" aria-label="Programas y noticias">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <div class="grid gap-6 lg:grid-cols-2">
+      <!-- Columna izquierda: destacado + notas de prensa -->
+      <div class="flex flex-col gap-6">
+        <a
+          href="/nosotros"
+          class="group block rounded-xl bg-subtle p-8 ring-1 ring-line transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+        >
+          <p class="text-sm font-semibold uppercase tracking-wide text-content/60">
+            Nuestra misión
+          </p>
+          <p class="mt-3 text-2xl font-bold leading-snug text-accent">
+            Bienestar y salud mental para adolescentes y jóvenes
+          </p>
+          <p class="mt-3 line-clamp-3 text-sm leading-relaxed text-content/70">
+            {site.mission}
+          </p>
+          <span
+            class="mt-4 inline-block text-sm font-semibold text-accent underline-offset-4 group-hover:underline"
+          >
+            Conócenos →
+          </span>
+        </a>
+
+        <!-- Notas de prensa -->
+        <div
+          class="flex min-h-64 flex-1 flex-col justify-end overflow-hidden rounded-xl bg-gradient-to-br from-brand via-brand-deep to-brand-deep"
+        >
+          <div class="flex-1 px-8 pt-10">
+            <p class="text-4xl font-bold leading-tight text-white/95">
+              Historias que
+              <span class="text-gold">conectan corazones</span>
+            </p>
+          </div>
+          <div class="bg-black/40 px-8 py-5 backdrop-blur-sm">
+            <p class="text-xs font-bold uppercase tracking-widest text-white">
+              Notas de prensa
+            </p>
+            <p class="mt-1 text-sm text-white/80">
+              Muy pronto compartiremos nuestras notas, convocatorias e
+              historias.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna derecha: mosaico de programas -->
+      <ul class="grid grid-cols-2 gap-4">
+        {
+          tiles.map((tile) => (
+            <li>
+              <a
+                href={tile.href}
+                class={`flex aspect-[8/5] flex-col justify-end rounded-xl p-5 shadow-sm transition-transform hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 ${tile.classes}`}
+              >
+                <span class="text-lg font-bold leading-tight sm:text-xl">
+                  {tile.title}
+                </span>
+                <span class="mt-1 text-xs font-medium opacity-80 sm:text-sm">
+                  {tile.subtitle}
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
