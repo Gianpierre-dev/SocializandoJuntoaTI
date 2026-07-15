@@ -2,6 +2,7 @@
 import BaseLayout from "../layouts/base-layout.astro";
 import { site } from "../data/site";
 import Hero from "../components/sections/hero.astro";
+import QuickAccess from "../components/sections/quick-access.astro";
 import AboutPreview from "../components/sections/about-preview.astro";
 import ActivitiesGrid from "../components/sections/activities-grid.astro";
 import TeamGrid from "../components/sections/team-grid.astro";
@@ -15,6 +16,7 @@ const description = site.objective;
 
 <BaseLayout title={title} description={description}>
   <Hero />
+  <QuickAccess />
   <AboutPreview />
   <ActivitiesGrid limit={6} />
   <TeamGrid />

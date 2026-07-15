@@ -1,7 +1,7 @@
 ---
 interface Props {
   href: string;
-  variant?: "primary" | "gold" | "ghost";
+  variant?: "primary" | "gold" | "ghost" | "outline-light";
   label: string;
 }
 
@@ -16,6 +16,8 @@ const variants: Record<NonNullable<Props["variant"]>, string> = {
   gold: "bg-gold text-brand-deep hover:bg-gold/90 focus-visible:ring-gold",
   ghost:
     "border border-accent text-accent hover:bg-accent hover:text-surface focus-visible:ring-brand",
+  "outline-light":
+    "border border-white/60 text-white hover:bg-white/10 focus-visible:ring-white focus-visible:ring-offset-brand-deep",
 };
 ---
 

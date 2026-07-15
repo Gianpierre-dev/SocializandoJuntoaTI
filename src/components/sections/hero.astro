@@ -5,29 +5,50 @@ import { site } from "../../data/site";
 import Button from "../ui/button.astro";
 ---
 
-<section
-  class="relative overflow-hidden bg-gradient-to-b from-subtle via-subtle to-page"
->
+<section class="relative overflow-hidden bg-brand-deep text-white">
+  <!-- Patrón decorativo de fondo -->
   <div
-    class="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 sm:px-6 md:grid-cols-2 md:py-24"
+    class="pointer-events-none absolute inset-0 opacity-10"
+    aria-hidden="true"
+  >
+    <svg class="h-full w-full" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <pattern
+          id="hero-dots"
+          width="28"
+          height="28"
+          patternUnits="userSpaceOnUse"
+        >
+          <circle cx="2" cy="2" r="1.5" fill="currentColor"></circle>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#hero-dots)"></rect>
+    </svg>
+  </div>
+  <div
+    class="pointer-events-none absolute -right-32 -top-32 h-96 w-96 rounded-full bg-brand opacity-40 blur-3xl"
+    aria-hidden="true"
+  >
+  </div>
+
+  <div
+    class="relative mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 sm:px-6 md:grid-cols-2 md:py-24"
   >
     <div class="text-center md:text-left">
       <p
-        class="text-sm font-semibold uppercase tracking-wide text-accent"
+        class="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-gold ring-1 ring-white/20"
       >
-        {site.name}
+        {site.name} · Desde {site.foundedDate}
       </p>
       <h1
-        class="mt-4 text-4xl font-bold leading-tight text-content sm:text-5xl"
+        class="mt-5 text-4xl font-bold leading-tight text-white sm:text-5xl"
       >
         {site.slogan || "Construimos espacios de bienestar emocional juvenil"}
       </h1>
       {
-        site.mission && (
-          <p
-            class="mx-auto mt-6 max-w-xl text-base leading-relaxed text-content/70 sm:text-lg md:mx-0"
-          >
-            {site.mission}
+        site.objective && (
+          <p class="mx-auto mt-6 max-w-xl text-base leading-relaxed text-white/80 sm:text-lg md:mx-0">
+            {site.objective}
           </p>
         )
       }
@@ -38,7 +59,7 @@ import Button from "../ui/button.astro";
         <Button href="/voluntariado" variant="gold" label="Sé voluntario" />
         <Button
           href="/actividades"
-          variant="ghost"
+          variant="outline-light"
           label="Conoce las actividades"
         />
       </div>
@@ -46,7 +67,7 @@ import Button from "../ui/button.astro";
 
     <div class="flex justify-center md:justify-end">
       <div
-        class="flex h-56 w-56 items-center justify-center rounded-full bg-white/70 p-8 shadow-lg ring-1 ring-brand/10 sm:h-72 sm:w-72"
+        class="flex h-56 w-56 items-center justify-center rounded-full bg-white/90 p-8 shadow-2xl ring-4 ring-white/20 sm:h-72 sm:w-72"
       >
         <Image
           src={logo}
