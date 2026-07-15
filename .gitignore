@@ -21,3 +21,7 @@ pnpm-debug.log*
 
 # macOS / editors
 .DS_Store
+
+# Playwright MCP artifacts
+.playwright-mcp/
+*.jpeg
