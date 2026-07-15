@@ -9,14 +9,14 @@ const allies = (await getCollection("allies")).sort(
 
 {
   allies.length > 0 && (
-    <section class="bg-subtle py-16 sm:py-20">
+    <section class="bg-subtle py-12 sm:py-16">
       <div class="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading
           title="Aliados"
           subtitle="Organizaciones y comunidades que caminan junto a nosotros."
         />
 
-        <ul class="mt-10 flex flex-wrap items-center justify-center gap-4">
+        <ul class="mt-12 flex flex-wrap items-center justify-center gap-4">
           {allies.map((ally) => {
             const content = (
               <span class="block text-center">

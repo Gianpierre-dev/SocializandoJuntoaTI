@@ -16,7 +16,7 @@ const socialLinks = [
   { label: "TikTok", href: site.socials.tiktok },
   { label: "Facebook", href: site.socials.facebook },
   { label: "WhatsApp", href: site.socials.whatsapp },
-].filter((link) => link.href);
+].filter((link) => link.href && link.href !== "#");
 
 const currentYear = new Date().getFullYear();
 ---
@@ -112,7 +112,7 @@ const currentYear = new Date().getFullYear();
     </div>
 
     <div
-      class="mt-10 flex flex-col gap-2 border-t border-white/10 pt-6 text-sm text-white/60 sm:flex-row sm:items-center sm:justify-between"
+      class="mt-10 flex flex-col gap-2 border-t border-white/10 pt-6 text-sm text-white/75 sm:flex-row sm:items-center sm:justify-between"
     >
       <p>&copy; {currentYear} {site.name}. Todos los derechos reservados.</p>
       {site.slogan && <p class="text-gold">{site.slogan}</p>}
