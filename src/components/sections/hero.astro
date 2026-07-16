@@ -1,128 +1,122 @@
 ---
 import { Image } from "astro:assets";
+import { getCollection } from "astro:content";
 import logo from "../../assets/logo.png";
-import { site } from "../../data/site";
 import Button from "../ui/button.astro";
 
-interface Slide {
-  id: string;
-  label: string;
-}
+const banners = (await getCollection("banners")).sort(
+  (a, b) => a.data.order - b.data.order,
+);
 
-const slides: Slide[] = [
-  { id: "banner-slogan", label: "Presentación" },
-  { id: "banner-voluntariado", label: "Convocatoria de voluntariado" },
-  { id: "banner-actividades", label: "Actividades" },
-];
+// Estilos por variante para banners sin imagen.
+const variantClasses = {
+  brand: "bg-brand text-white",
+  gold: "bg-gold text-brand-deep",
+  green: "bg-green text-brand-deep",
+} as const;
+
+const kickerClasses = {
+  brand: "text-gold",
+  gold: "text-brand-deep",
+  green: "text-brand-deep",
+} as const;
+
+const ctaVariants = {
+  brand: "gold",
+  gold: "primary",
+  green: "primary",
+} as const;
 ---
 
-<section
-  class="bg-page py-6"
-  aria-roledescription="carrusel"
-  aria-label="Banners destacados"
->
-  <div class="mx-auto max-w-6xl px-4 sm:px-6">
-    <div
-      id="hero-carousel"
-      class="flex snap-x snap-mandatory overflow-x-auto scroll-smooth rounded-xl shadow-md [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+{
+  banners.length > 0 && (
+    <section
+      class="bg-page py-6"
+      aria-roledescription="carrusel"
+      aria-label="Banners destacados"
     >
-      <!-- Banner 1: presentación -->
-      <div
-        id="banner-slogan"
-        class="grid w-full shrink-0 snap-center items-center gap-6 bg-brand px-8 py-12 text-white sm:grid-cols-[1fr_auto] sm:px-14 sm:py-16"
-        role="group"
-        aria-roledescription="banner"
-        aria-label="1 de 3"
-      >
-        <div>
-          <p class="text-xs font-bold uppercase tracking-widest text-gold">
-            {site.name}
-          </p>
-          <p class="mt-3 text-3xl font-bold leading-tight sm:text-4xl">
-            {site.slogan}
-          </p>
-          <p class="mt-4 max-w-xl text-sm text-white/80 sm:text-base">
-            Promovemos el cuidado de la salud mental en adolescentes y jóvenes
-            desde el {site.foundedDate}.
-          </p>
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <div
+          id="hero-carousel"
+          class="flex snap-x snap-mandatory overflow-x-auto scroll-smooth rounded-xl shadow-md [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {banners.map((banner, index) => (
+            <div
+              class="w-full shrink-0 snap-center"
+              role="group"
+              aria-roledescription="banner"
+              aria-label={`${index + 1} de ${banners.length}`}
+            >
+              {banner.data.image ? (
+                <a
+                  href={banner.data.href}
+                  class="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand"
+                >
+                  <Image
+                    src={banner.data.image}
+                    alt={banner.data.alt ?? banner.data.title}
+                    widths={[640, 1024, 1940]}
+                    sizes="(max-width: 1152px) 100vw, 1152px"
+                    class="aspect-[10/3] w-full object-cover"
+                  />
+                </a>
+              ) : (
+                <div
+                  class={`grid h-full items-center gap-6 px-8 py-12 sm:grid-cols-[1fr_auto] sm:px-14 sm:py-16 ${variantClasses[banner.data.variant]}`}
+                >
+                  <div>
+                    <p
+                      class={`text-xs font-bold uppercase tracking-widest ${kickerClasses[banner.data.variant]}`}
+                    >
+                      {banner.data.kicker}
+                    </p>
+                    <p class="mt-3 text-3xl font-bold leading-tight sm:text-4xl">
+                      {banner.data.title}
+                    </p>
+                    {banner.data.description && (
+                      <p class="mt-4 max-w-xl text-sm opacity-90 sm:text-base">
+                        {banner.data.description}
+                      </p>
+                    )}
+                  </div>
+                  {banner.data.ctaLabel ? (
+                    <Button
+                      href={banner.data.href}
+                      variant={ctaVariants[banner.data.variant]}
+                      label={banner.data.ctaLabel}
+                    />
+                  ) : (
+                    <div class="hidden sm:block">
+                      <Image
+                        src={logo}
+                        alt=""
+                        width={176}
+                        height={176}
+                        class="h-44 w-44 object-contain drop-shadow-lg"
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
-        <div class="hidden sm:block">
-          <Image
-            src={logo}
-            alt=""
-            width={176}
-            height={176}
-            class="h-44 w-44 object-contain drop-shadow-lg"
-          />
+
+        {/* Indicadores */}
+        <div class="mt-4 flex justify-center gap-2" role="tablist">
+          {banners.map((banner, index) => (
+            <button
+              type="button"
+              class="hero-dot h-3 w-3 rounded-full bg-content/25 transition-colors hover:bg-brand/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand data-[active]:bg-brand"
+              data-active={index === 0 ? "" : undefined}
+              aria-label={`Ir al banner: ${banner.data.title}`}
+            />
+          ))}
         </div>
       </div>
-
-      <!-- Banner 2: convocatoria de voluntariado -->
-      <div
-        id="banner-voluntariado"
-        class="grid w-full shrink-0 snap-center items-center gap-6 bg-gold px-8 py-12 text-brand-deep sm:grid-cols-[1fr_auto] sm:px-14 sm:py-16"
-        role="group"
-        aria-roledescription="banner"
-        aria-label="2 de 3"
-      >
-        <div>
-          <p class="text-xs font-bold uppercase tracking-widest">
-            Convocatoria abierta
-          </p>
-          <p class="mt-3 text-3xl font-bold leading-tight sm:text-4xl">
-            Programa de Voluntariado Juvenil
-          </p>
-          <p class="mt-4 max-w-xl text-sm sm:text-base">
-            Si tienes entre 18 y 35 años y te interesa la salud mental, esta
-            es tu oportunidad de generar impacto.
-          </p>
-        </div>
-        <Button href="/voluntariado" variant="primary" label="Postula aquí" />
-      </div>
-
-      <!-- Banner 3: actividades -->
-      <div
-        id="banner-actividades"
-        class="grid w-full shrink-0 snap-center items-center gap-6 bg-green px-8 py-12 text-brand-deep sm:grid-cols-[1fr_auto] sm:px-14 sm:py-16"
-        role="group"
-        aria-roledescription="banner"
-        aria-label="3 de 3"
-      >
-        <div>
-          <p class="text-xs font-bold uppercase tracking-widest">
-            Talleres y dinámicas
-          </p>
-          <p class="mt-3 text-3xl font-bold leading-tight sm:text-4xl">
-            Actividades en los parques de Lima
-          </p>
-          <p class="mt-4 max-w-xl text-sm sm:text-base">
-            {site.locations.join(" · ")}
-          </p>
-        </div>
-        <Button
-          href="/actividades"
-          variant="primary"
-          label="Ver actividades"
-        />
-      </div>
-    </div>
-
-    <!-- Indicadores -->
-    <div class="mt-4 flex justify-center gap-2" role="tablist">
-      {
-        slides.map((slide, index) => (
-          <button
-            type="button"
-            class="hero-dot h-3 w-3 rounded-full bg-content/25 transition-colors hover:bg-brand/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand data-[active]:bg-brand"
-            data-target={slide.id}
-            data-active={index === 0 ? "" : undefined}
-            aria-label={`Ir al banner: ${slide.label}`}
-          />
-        ))
-      }
-    </div>
-  </div>
-</section>
+    </section>
+  )
+}
 
 <script>
   const carousel = document.getElementById("hero-carousel");

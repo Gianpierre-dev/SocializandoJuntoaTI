@@ -1,0 +1,7 @@
+---
+title: "Noticias"
+subtitle: "Notas y convocatorias"
+href: "/blog"
+variant: "deep"
+order: 5
+---

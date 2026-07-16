@@ -1,0 +1,7 @@
+---
+title: "Áreas de trabajo"
+subtitle: "6 equipos de voluntariado"
+href: "/voluntariado#areas"
+variant: "rose"
+order: 3
+---

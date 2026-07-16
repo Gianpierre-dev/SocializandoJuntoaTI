@@ -45,4 +45,49 @@ const allies = defineCollection({
   }),
 });
 
-export const collections = { activities, values, team, allies };
+// Banners del carrusel de portada. Con `image` se muestra la pieza gráfica
+// completa (recomendado 1940x582, ratio 10:3, como los banners de SENAJU);
+// sin `image` se renderiza la composición de color con los textos.
+const banners = defineCollection({
+  loader: glob({ pattern: "*.md", base: "./src/content/banners" }),
+  schema: ({ image }) =>
+    z.object({
+      title: z.string(),
+      kicker: z.string(),
+      description: z.string().optional(),
+      href: z.string(),
+      ctaLabel: z.string().optional(),
+      variant: z.enum(["brand", "gold", "green"]).default("brand"),
+      image: image().optional(),
+      /** Texto alternativo obligatorio cuando el banner es una imagen. */
+      alt: z.string().optional(),
+      order: z.number(),
+    }),
+});
+
+// Tiles del mosaico de programas. Con `image` se muestra la pieza gráfica
+// (recomendado 924x616, ratio 3:2); sin `image`, tile de color con textos.
+const programas = defineCollection({
+  loader: glob({ pattern: "*.md", base: "./src/content/programas" }),
+  schema: ({ image }) =>
+    z.object({
+      title: z.string(),
+      subtitle: z.string(),
+      href: z.string(),
+      variant: z
+        .enum(["brand", "gold", "rose", "green", "deep", "subtle"])
+        .default("brand"),
+      image: image().optional(),
+      alt: z.string().optional(),
+      order: z.number(),
+    }),
+});
+
+export const collections = {
+  activities,
+  values,
+  team,
+  allies,
+  banners,
+  programas,
+};

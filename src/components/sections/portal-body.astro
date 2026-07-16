@@ -1,53 +1,23 @@
 ---
 // Cuerpo tipo portal institucional: destacado + notas de prensa a la izquierda,
-// mosaico de accesos a programas a la derecha.
+// mosaico de accesos a programas a la derecha (configurable en src/content/programas).
+import { Image } from "astro:assets";
+import { getCollection } from "astro:content";
 import { site } from "../../data/site";
 
-interface Tile {
-  title: string;
-  subtitle: string;
-  href: string;
-  classes: string;
-}
+const programas = (await getCollection("programas")).sort(
+  (a, b) => a.data.order - b.data.order,
+);
 
-const tiles: Tile[] = [
-  {
-    title: "Voluntariado",
-    subtitle: "Convocatoria abierta",
-    href: "/voluntariado",
-    classes: "bg-brand text-white",
-  },
-  {
-    title: "Actividades",
-    subtitle: "Talleres y dinámicas",
-    href: "/actividades",
-    classes: "bg-gold text-brand-deep",
-  },
-  {
-    title: "Áreas de trabajo",
-    subtitle: "6 equipos de voluntariado",
-    href: "/voluntariado#areas",
-    classes: "bg-rose text-brand-deep",
-  },
-  {
-    title: "Nosotros",
-    subtitle: "Misión, visión y equipo",
-    href: "/nosotros",
-    classes: "bg-green text-brand-deep",
-  },
-  {
-    title: "Noticias",
-    subtitle: "Notas y convocatorias",
-    href: "/blog",
-    classes: "bg-brand-deep text-white",
-  },
-  {
-    title: "Contacto",
-    subtitle: "Alianzas y consultas",
-    href: "/contacto",
-    classes: "bg-subtle text-accent ring-1 ring-line",
-  },
-];
+// Estilos por variante para tiles sin imagen.
+const variantClasses = {
+  brand: "bg-brand text-white",
+  gold: "bg-gold text-brand-deep",
+  rose: "bg-rose text-brand-deep",
+  green: "bg-green text-brand-deep",
+  deep: "bg-brand-deep text-white",
+  subtle: "bg-subtle text-accent ring-1 ring-line",
+} as const;
 ---
 
 <section class="bg-page pb-16" aria-label="Programas y noticias">
@@ -100,19 +70,34 @@ const tiles: Tile[] = [
       <!-- Columna derecha: mosaico de programas -->
       <ul class="grid grid-cols-2 gap-4">
         {
-          tiles.map((tile) => (
+          programas.map((programa) => (
             <li>
-              <a
-                href={tile.href}
-                class={`flex aspect-[8/5] flex-col justify-end rounded-xl p-5 shadow-sm transition-transform hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 ${tile.classes}`}
-              >
-                <span class="text-lg font-bold leading-tight sm:text-xl">
-                  {tile.title}
-                </span>
-                <span class="mt-1 text-sm font-medium opacity-80">
-                  {tile.subtitle}
-                </span>
-              </a>
+              {programa.data.image ? (
+                <a
+                  href={programa.data.href}
+                  class="block overflow-hidden rounded-xl shadow-sm transition-transform hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
+                >
+                  <Image
+                    src={programa.data.image}
+                    alt={programa.data.alt ?? programa.data.title}
+                    widths={[320, 640, 924]}
+                    sizes="(max-width: 640px) 50vw, 280px"
+                    class="aspect-[3/2] w-full object-cover"
+                  />
+                </a>
+              ) : (
+                <a
+                  href={programa.data.href}
+                  class={`flex aspect-[8/5] flex-col justify-end rounded-xl p-5 shadow-sm transition-transform hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 ${variantClasses[programa.data.variant]}`}
+                >
+                  <span class="text-lg font-bold leading-tight sm:text-xl">
+                    {programa.data.title}
+                  </span>
+                  <span class="mt-1 text-sm font-medium opacity-80">
+                    {programa.data.subtitle}
+                  </span>
+                </a>
+              )}
             </li>
           ))
         }
