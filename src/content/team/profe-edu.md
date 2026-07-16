@@ -1,7 +1,0 @@
----
-name: "Profe Edu"
-handle: "@profeEdu"
-role: "Profesor"
-photo: ""
-order: 1
----

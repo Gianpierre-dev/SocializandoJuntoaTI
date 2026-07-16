@@ -1,6 +1,0 @@
----
-name: "Mallki Wasi Ecovida"
-handle: "@mallkiwasiecovida"
-url: "https://www.instagram.com/mallkiwasiecovida/"
-order: 1
----

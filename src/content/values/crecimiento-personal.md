@@ -1,5 +1,0 @@
----
-title: "Crecimiento personal"
-description: "Promovemos el aprendizaje constante, el autodescubrimiento y la superación, priorizando la salud mental, emocional y social."
-order: 3
----

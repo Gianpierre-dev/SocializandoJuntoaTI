@@ -1,9 +1,0 @@
----
-title: "Programas psicológicos"
-summary: "Próximamente."
-description: "Programas psicológicos en desarrollo."
-cost: "Por definir"
-modality: "mixto"
-order: 8
-status: "in-development"
----

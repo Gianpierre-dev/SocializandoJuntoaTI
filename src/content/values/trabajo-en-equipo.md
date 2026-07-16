@@ -1,5 +1,0 @@
----
-title: "Trabajo en Equipo"
-description: "Fomentamos la colaboración y la creatividad, permitiendo que cada miembro aporte su perspectiva única."
-order: 4
----

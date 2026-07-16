@@ -1,7 +1,0 @@
----
-name: "Belen"
-handle: "@psicologaBelen"
-role: "Psicóloga"
-photo: ""
-order: 10
----

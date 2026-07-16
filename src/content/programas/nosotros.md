@@ -1,7 +1,0 @@
----
-title: "Nosotros"
-subtitle: "Misión, visión y equipo"
-href: "/nosotros"
-variant: "green"
-order: 4
----

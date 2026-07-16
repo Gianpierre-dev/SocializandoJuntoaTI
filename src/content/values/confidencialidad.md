@@ -1,5 +1,0 @@
----
-title: "Confidencialidad"
-description: "Protegemos la información personal y emocional de los participantes, garantizando un espacio seguro."
-order: 5
----

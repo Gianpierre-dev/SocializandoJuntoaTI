@@ -1,6 +1,0 @@
----
-name: "Jan Vegan Market"
-handle: "@janveganmarket"
-url: "https://www.instagram.com/janveganmarket/"
-order: 3
----

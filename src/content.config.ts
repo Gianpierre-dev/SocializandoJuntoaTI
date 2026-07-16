@@ -3,7 +3,7 @@ import { z } from "astro/zod";
 import { glob } from "astro/loaders";
 
 const activities = defineCollection({
-  loader: glob({ pattern: "*.md", base: "./src/content/activities" }),
+  loader: glob({ pattern: "*.yaml", base: "./src/content/activities" }),
   schema: z.object({
     title: z.string(),
     summary: z.string(),
@@ -16,7 +16,7 @@ const activities = defineCollection({
 });
 
 const values = defineCollection({
-  loader: glob({ pattern: "*.md", base: "./src/content/values" }),
+  loader: glob({ pattern: "*.yaml", base: "./src/content/values" }),
   schema: z.object({
     title: z.string(),
     description: z.string(),
@@ -25,7 +25,7 @@ const values = defineCollection({
 });
 
 const team = defineCollection({
-  loader: glob({ pattern: "*.md", base: "./src/content/team" }),
+  loader: glob({ pattern: "*.yaml", base: "./src/content/team" }),
   schema: z.object({
     name: z.string(),
     handle: z.string(),
@@ -36,7 +36,7 @@ const team = defineCollection({
 });
 
 const allies = defineCollection({
-  loader: glob({ pattern: "*.md", base: "./src/content/allies" }),
+  loader: glob({ pattern: "*.yaml", base: "./src/content/allies" }),
   schema: z.object({
     name: z.string(),
     handle: z.string(),
@@ -49,7 +49,7 @@ const allies = defineCollection({
 // completa (recomendado 1940x582, ratio 10:3, como los banners de SENAJU);
 // sin `image` se renderiza la composición de color con los textos.
 const banners = defineCollection({
-  loader: glob({ pattern: "*.md", base: "./src/content/banners" }),
+  loader: glob({ pattern: "*.yaml", base: "./src/content/banners" }),
   schema: ({ image }) =>
     z.object({
       title: z.string(),
@@ -58,9 +58,10 @@ const banners = defineCollection({
       href: z.string(),
       ctaLabel: z.string().optional(),
       variant: z.enum(["brand", "gold", "green"]).default("brand"),
-      image: image().optional(),
+      // nullish: el panel (Keystatic) escribe null cuando el campo queda vacío.
+      image: image().nullish(),
       /** Texto alternativo obligatorio cuando el banner es una imagen. */
-      alt: z.string().optional(),
+      alt: z.string().nullish(),
       order: z.number(),
     }),
 });
@@ -68,7 +69,7 @@ const banners = defineCollection({
 // Tiles del mosaico de programas. Con `image` se muestra la pieza gráfica
 // (recomendado 924x616, ratio 3:2); sin `image`, tile de color con textos.
 const programas = defineCollection({
-  loader: glob({ pattern: "*.md", base: "./src/content/programas" }),
+  loader: glob({ pattern: "*.yaml", base: "./src/content/programas" }),
   schema: ({ image }) =>
     z.object({
       title: z.string(),
@@ -77,8 +78,8 @@ const programas = defineCollection({
       variant: z
         .enum(["brand", "gold", "rose", "green", "deep", "subtle"])
         .default("brand"),
-      image: image().optional(),
-      alt: z.string().optional(),
+      image: image().nullish(),
+      alt: z.string().nullish(),
       order: z.number(),
     }),
 });

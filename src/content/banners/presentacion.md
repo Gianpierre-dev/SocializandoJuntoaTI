@@ -1,8 +1,0 @@
----
-title: "Conectamos corazones, fortalecemos mentes"
-kicker: "Socializando Junto A Ti"
-description: "Promovemos el cuidado de la salud mental en adolescentes y jóvenes desde el 17 de marzo de 2024."
-href: "/nosotros"
-variant: "brand"
-order: 1
----
