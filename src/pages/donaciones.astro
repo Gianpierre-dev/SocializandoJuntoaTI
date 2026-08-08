@@ -1,0 +1,196 @@
+---
+import { Image } from "astro:assets";
+import { getEntry } from "astro:content";
+import BaseLayout from "../layouts/base-layout.astro";
+import { site } from "../data/site";
+
+const donaciones = await getEntry("donaciones", "config");
+const datos = donaciones?.data;
+
+const pageTitle = `Donaciones | ${site.name}`;
+const pageDescription = `Apoya el trabajo de ${site.name}: cada donación se convierte en talleres, dinámicas y espacios seguros de salud mental para adolescentes y jóvenes.`;
+
+const tieneYape = Boolean(datos?.yapeNumero || datos?.yapeQr);
+const tienePlin = Boolean(datos?.plinNumero || datos?.plinQr);
+const tieneCuentas = (datos?.cuentas.length ?? 0) > 0;
+const tienePaypal = Boolean(datos?.paypalUrl);
+const tieneCanales = tieneYape || tienePlin || tieneCuentas || tienePaypal;
+---
+
+<BaseLayout title={pageTitle} description={pageDescription}>
+  <!-- Intro -->
+  <section class="bg-brand-deep py-16 text-white sm:py-20">
+    <div class="mx-auto max-w-3xl px-4 text-center sm:px-6">
+      <h1 class="text-4xl font-bold sm:text-5xl">Donaciones</h1>
+      {
+        datos?.intro && (
+          <p class="mt-5 text-base leading-relaxed text-white/90 sm:text-lg">
+            {datos.intro}
+          </p>
+        )
+      }
+    </div>
+  </section>
+
+  <!-- Impacto -->
+  {
+    (datos?.impactos.length ?? 0) > 0 && (
+      <section class="bg-page py-16 sm:py-20" aria-label="Qué logra tu donación">
+        <div class="mx-auto max-w-6xl px-4 sm:px-6">
+          <h2 class="text-center text-3xl font-bold text-content sm:text-4xl">
+            ¿Qué logra tu donación?
+          </h2>
+          <ul class="mx-auto mt-12 grid max-w-4xl gap-6 sm:grid-cols-3">
+            {datos?.impactos.map((impacto) => (
+              <li class="rounded-2xl border border-line bg-surface p-6 text-center shadow-sm">
+                <p class="text-3xl font-bold text-accent">{impacto.monto}</p>
+                <p class="mt-3 text-sm leading-relaxed text-content/70">
+                  {impacto.descripcion}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- Canales de donación -->
+  <section class="bg-subtle py-16 sm:py-20" aria-label="Canales para donar">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      <h2 class="text-center text-3xl font-bold text-content sm:text-4xl">
+        ¿Cómo donar?
+      </h2>
+
+      {
+        tieneCanales ? (
+          <div class="mx-auto mt-12 grid max-w-4xl gap-6 sm:grid-cols-2">
+            {tieneYape && (
+              <div class="flex flex-col items-center rounded-2xl border border-line bg-surface p-8 text-center shadow-sm">
+                <h3 class="text-xl font-bold text-content">Yape</h3>
+                {datos?.yapeQr && (
+                  <Image
+                    src={datos.yapeQr}
+                    alt="Código QR de Yape para donar"
+                    width={220}
+                    height={220}
+                    class="mt-5 h-52 w-52 rounded-xl object-contain"
+                  />
+                )}
+                {datos?.yapeNumero && (
+                  <p class="mt-4 text-lg font-semibold text-accent">
+                    {datos.yapeNumero}
+                  </p>
+                )}
+                <p class="mt-2 text-sm text-content/60">
+                  Escanea el QR o busca el número en tu app de Yape.
+                </p>
+              </div>
+            )}
+
+            {tienePlin && (
+              <div class="flex flex-col items-center rounded-2xl border border-line bg-surface p-8 text-center shadow-sm">
+                <h3 class="text-xl font-bold text-content">Plin</h3>
+                {datos?.plinQr && (
+                  <Image
+                    src={datos.plinQr}
+                    alt="Código QR de Plin para donar"
+                    width={220}
+                    height={220}
+                    class="mt-5 h-52 w-52 rounded-xl object-contain"
+                  />
+                )}
+                {datos?.plinNumero && (
+                  <p class="mt-4 text-lg font-semibold text-accent">
+                    {datos.plinNumero}
+                  </p>
+                )}
+                <p class="mt-2 text-sm text-content/60">
+                  Escanea el QR o busca el número en tu app de Plin.
+                </p>
+              </div>
+            )}
+
+            {tieneCuentas && (
+              <div
+                class={`rounded-2xl border border-line bg-surface p-8 shadow-sm ${
+                  tieneYape !== tienePlin ? "" : "sm:col-span-2"
+                }`}
+              >
+                <h3 class="text-center text-xl font-bold text-content">
+                  Transferencia bancaria
+                </h3>
+                <ul class="mt-5 space-y-4">
+                  {datos?.cuentas.map((cuenta) => (
+                    <li class="rounded-xl bg-subtle p-4 text-sm">
+                      <p class="font-semibold text-content">
+                        {cuenta.banco}
+                        {cuenta.titular && (
+                          <span class="font-normal text-content/60">
+                            {" "}
+                            · {cuenta.titular}
+                          </span>
+                        )}
+                      </p>
+                      {cuenta.numero && (
+                        <p class="mt-1 text-content/80">
+                          Cuenta: <span class="font-medium">{cuenta.numero}</span>
+                        </p>
+                      )}
+                      {cuenta.cci && (
+                        <p class="text-content/80">
+                          CCI: <span class="font-medium">{cuenta.cci}</span>
+                        </p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {tienePaypal && (
+              <div class="flex flex-col items-center justify-center rounded-2xl border border-line bg-surface p-8 text-center shadow-sm sm:col-span-2">
+                <h3 class="text-xl font-bold text-content">
+                  ¿Donas desde el extranjero?
+                </h3>
+                <p class="mt-2 text-sm text-content/60">
+                  Puedes apoyarnos de forma segura a través de PayPal.
+                </p>
+                <a
+                  href={datos?.paypalUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="mt-5 inline-flex items-center justify-center rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
+                >
+                  Donar con PayPal
+                </a>
+              </div>
+            )}
+          </div>
+        ) : (
+          <p class="mx-auto mt-10 max-w-xl text-center text-content/60">
+            Muy pronto habilitaremos nuestros canales de donación. Mientras
+            tanto, puedes escribirnos por nuestras redes sociales para
+            coordinar tu aporte.
+          </p>
+        )
+      }
+    </div>
+  </section>
+
+  <!-- Transparencia -->
+  <section class="bg-page py-16 sm:py-20" aria-label="Compromiso de transparencia">
+    <div class="mx-auto max-w-3xl px-4 text-center sm:px-6">
+      <h2 class="text-3xl font-bold text-content sm:text-4xl">
+        Nuestro compromiso
+      </h2>
+      <p class="mt-5 leading-relaxed text-content/70">
+        Cada donación se destina íntegramente a las actividades de la
+        organización: materiales para talleres, logística de las dinámicas en
+        parques y ediciones especiales con especialistas en salud mental.
+        Compartimos los resultados de nuestras actividades en redes sociales
+        para que veas el impacto de tu aporte.
+      </p>
+    </div>
+  </section>
+</BaseLayout>

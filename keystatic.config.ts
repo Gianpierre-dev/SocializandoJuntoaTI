@@ -23,7 +23,7 @@ export default config({
     navigation: {
       Portada: ["banners", "programas"],
       Contenido: ["activities", "team", "allies", "values"],
-      Configuración: ["site"],
+      Configuración: ["site", "donaciones"],
     },
   },
 
@@ -81,6 +81,62 @@ export default config({
           {
             label: "Áreas de trabajo",
             itemLabel: (props) => props.fields.title.value,
+          },
+        ),
+      },
+    }),
+
+    donaciones: singleton({
+      label: "Donaciones",
+      path: "src/content/donaciones/config",
+      format: { data: "yaml" },
+      schema: {
+        intro: fields.text({
+          label: "Texto de introducción",
+          multiline: true,
+        }),
+        yapeNumero: fields.text({
+          label: "Número de Yape",
+          description: "Celular asociado a la cuenta Yape de la organización.",
+        }),
+        yapeQr: fields.image({
+          label: "QR de Yape",
+          directory: "src/assets/donaciones",
+          publicPath: "../../assets/donaciones/",
+        }),
+        plinNumero: fields.text({ label: "Número de Plin" }),
+        plinQr: fields.image({
+          label: "QR de Plin",
+          directory: "src/assets/donaciones",
+          publicPath: "../../assets/donaciones/",
+        }),
+        paypalUrl: fields.text({
+          label: "Enlace de PayPal (donantes del extranjero)",
+          description: "Ej.: https://paypal.me/socializandojuntoati",
+        }),
+        cuentas: fields.array(
+          fields.object({
+            banco: fields.text({ label: "Banco" }),
+            titular: fields.text({ label: "Titular de la cuenta" }),
+            numero: fields.text({ label: "Número de cuenta" }),
+            cci: fields.text({ label: "CCI (interbancario)" }),
+          }),
+          {
+            label: "Cuentas bancarias",
+            itemLabel: (props) => props.fields.banco.value,
+          },
+        ),
+        impactos: fields.array(
+          fields.object({
+            monto: fields.text({ label: "Monto (ej.: S/ 50)" }),
+            descripcion: fields.text({
+              label: "Qué se logra con ese monto",
+              multiline: true,
+            }),
+          }),
+          {
+            label: "Ejemplos de impacto",
+            itemLabel: (props) => props.fields.monto.value,
           },
         ),
       },

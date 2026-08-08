@@ -84,6 +84,34 @@ const programas = defineCollection({
     }),
 });
 
+// Datos de la página de donaciones (entrada única editable desde el panel).
+const donaciones = defineCollection({
+  loader: glob({ pattern: "*.yaml", base: "./src/content/donaciones" }),
+  schema: ({ image }) =>
+    z.object({
+      intro: z.string(),
+      yapeNumero: z.string().nullish(),
+      yapeQr: image().nullish(),
+      plinNumero: z.string().nullish(),
+      plinQr: image().nullish(),
+      paypalUrl: z.string().nullish(),
+      cuentas: z.array(
+        z.object({
+          banco: z.string(),
+          titular: z.string(),
+          numero: z.string(),
+          cci: z.string(),
+        }),
+      ),
+      impactos: z.array(
+        z.object({
+          monto: z.string(),
+          descripcion: z.string(),
+        }),
+      ),
+    }),
+});
+
 export const collections = {
   activities,
   values,
@@ -91,4 +119,5 @@ export const collections = {
   allies,
   banners,
   programas,
+  donaciones,
 };
