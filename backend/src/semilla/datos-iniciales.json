@@ -1,0 +1,364 @@
+{
+  "banners": [
+    {
+      "title": "Actividades en los parques de Lima",
+      "kicker": "Talleres y dinámicas",
+      "description": "Campo de Marte · Parque de la Exposición · Parque María Reiche · Parque de la Pera",
+      "href": "/actividades",
+      "ctaLabel": "Ver actividades",
+      "variant": "green",
+      "order": 3
+    },
+    {
+      "title": "Tu apoyo transforma vidas",
+      "kicker": "Donaciones",
+      "description": "Cada aporte se convierte en talleres, materiales y espacios seguros de salud mental para adolescentes y jóvenes.",
+      "href": "/donaciones",
+      "ctaLabel": "Quiero donar",
+      "variant": "brand",
+      "order": 4
+    },
+    {
+      "title": "Conectamos corazones, fortalecemos mentes",
+      "kicker": "Socializando Junto A Ti",
+      "description": "Promovemos el cuidado de la salud mental en adolescentes y jóvenes desde el 17 de marzo de 2024.",
+      "href": "/nosotros",
+      "variant": "brand",
+      "order": 1
+    },
+    {
+      "title": "Programa de Voluntariado Juvenil",
+      "kicker": "Convocatoria abierta",
+      "description": "Si tienes entre 18 y 35 años y te interesa la salud mental, esta es tu oportunidad de generar impacto.",
+      "href": "/voluntariado",
+      "ctaLabel": "Postula aquí",
+      "variant": "gold",
+      "order": 2
+    }
+  ],
+  "programas": [
+    {
+      "title": "Actividades",
+      "subtitle": "Talleres y dinámicas",
+      "href": "/actividades",
+      "variant": "gold",
+      "order": 2
+    },
+    {
+      "title": "Áreas de trabajo",
+      "subtitle": "6 equipos de voluntariado",
+      "href": "/voluntariado#areas",
+      "variant": "rose",
+      "order": 3
+    },
+    {
+      "title": "Contacto",
+      "subtitle": "Alianzas y consultas",
+      "href": "/contacto",
+      "variant": "subtle",
+      "order": 6
+    },
+    {
+      "title": "Nosotros",
+      "subtitle": "Misión, visión y equipo",
+      "href": "/nosotros",
+      "variant": "green",
+      "order": 4
+    },
+    {
+      "title": "Noticias",
+      "subtitle": "Notas y convocatorias",
+      "href": "/blog",
+      "variant": "deep",
+      "order": 5
+    },
+    {
+      "title": "Voluntariado",
+      "subtitle": "Convocatoria abierta",
+      "href": "/voluntariado",
+      "variant": "brand",
+      "order": 1
+    }
+  ],
+  "actividades": [
+    {
+      "title": "Conversatorios online",
+      "summary": "Espacios de escucha activa para compartir emociones y conversar en confianza.",
+      "description": "Cada dos semanas compartimos nuestro estado de ánimo, emociones y pensamientos, y elegimos un tema en común para conversar libremente, fortaleciendo el vínculo y el bienestar social. Vía Google Meet o Zoom.",
+      "cost": "Gratuito",
+      "modality": "online",
+      "order": 4,
+      "status": "active"
+    },
+    {
+      "title": "Ediciones especiales",
+      "summary": "Actividades especiales según fechas festivas del calendario.",
+      "description": "Por fechas festivas relacionadas con la salud mental y el bienestar, con charlas, talleres y celebraciones de cumpleaños de la comunidad.",
+      "cost": "Gratuito o desde S/ 5 según la actividad",
+      "modality": "mixto",
+      "order": 6,
+      "status": "active"
+    },
+    {
+      "title": "Gincanas deportivas",
+      "summary": "Actividades físicas y mentales para concientizar sobre la importancia del movimiento.",
+      "description": "Incluyen calentamiento, pausas activas y momentos competitivos grupales e individuales, en ocasiones dirigidas por colaboradores o instituciones. Generalmente los fines de semana.",
+      "cost": "Desde S/ 5 por participante (incluye materiales)",
+      "modality": "presencial",
+      "order": 2,
+      "status": "active"
+    },
+    {
+      "title": "Picnics sociales",
+      "summary": "Encuentros al aire libre con temáticas psicológicas, dinámicas grupales y un especialista invitado.",
+      "description": "Abordamos temáticas psicológicas según las festividades o días memorables, con dinámicas grupales (materiales incluidos), arte, espacios de escucha activa, música y la aplicación de talleres. Cerramos compartiendo el picnic.",
+      "cost": "Desde S/ 5 por participante (incluye materiales)",
+      "modality": "presencial",
+      "order": 1,
+      "status": "active"
+    },
+    {
+      "title": "Podcast de desarrollo personal",
+      "summary": "Próximamente.",
+      "description": "Podcast de desarrollo personal en desarrollo.",
+      "cost": "Gratuito",
+      "modality": "online",
+      "order": 9,
+      "status": "in-development"
+    },
+    {
+      "title": "Programas psicológicos",
+      "summary": "Próximamente.",
+      "description": "Programas psicológicos en desarrollo.",
+      "cost": "Por definir",
+      "modality": "mixto",
+      "order": 8,
+      "status": "in-development"
+    },
+    {
+      "title": "Salidas de integración",
+      "summary": "Salidas recreativas para integrarnos, entretenernos y relajarnos.",
+      "description": "Definimos juntos el lugar, la fecha y la hora (cine, museo, playa, juegos de mesa y más), generalmente los fines de semana o feriados.",
+      "cost": "Gratuito",
+      "modality": "presencial",
+      "order": 5,
+      "status": "active"
+    },
+    {
+      "title": "Talleres online",
+      "summary": "Talleres con distintas temáticas psicológicas y material de apoyo.",
+      "description": "Vía Google Meet o Zoom, con dinámicas, herramientas, tips y aprendizajes, acompañados de diapositivas y un flyer por taller. La fecha se coordina por encuesta.",
+      "cost": "Desde S/ 3 por participante (incluye flyer, diapositivas y materiales)",
+      "modality": "online",
+      "order": 7,
+      "status": "active"
+    },
+    {
+      "title": "Voluntariados sociales",
+      "summary": "Acciones de ayuda social animalista, humanista o ambientalista.",
+      "description": "Coordinamos con asociaciones, centros humanitarios y otros voluntariados de Lima para brindar ayuda social, con la posibilidad de colaborar junto a otras organizaciones.",
+      "cost": "Gratuito",
+      "modality": "presencial",
+      "order": 3,
+      "status": "active"
+    }
+  ],
+  "equipo": [
+    {
+      "name": "Alan Centeno",
+      "handle": "@psicologoAlancenteno",
+      "role": "Psicólogo",
+      "photo": "",
+      "order": 2
+    },
+    {
+      "name": "Belen",
+      "handle": "@psicologaBelen",
+      "role": "Psicóloga",
+      "photo": "",
+      "order": 10
+    },
+    {
+      "name": "Bruno",
+      "handle": "@obstetraBruno",
+      "role": "Obstetra",
+      "photo": "",
+      "order": 11
+    },
+    {
+      "name": "Daniel",
+      "handle": "@psicologoDaniel",
+      "role": "Psicólogo",
+      "photo": "",
+      "order": 8
+    },
+    {
+      "name": "Ignacio Atau",
+      "handle": "@psicoignacioatau",
+      "role": "Psicólogo",
+      "photo": "",
+      "order": 12
+    },
+    {
+      "name": "Ivelisse",
+      "handle": "@psicologaIvelisse",
+      "role": "Psicóloga",
+      "photo": "",
+      "order": 3
+    },
+    {
+      "name": "Jhairss",
+      "handle": "@psicojhairss",
+      "role": "Psicólogo",
+      "photo": "",
+      "order": 4
+    },
+    {
+      "name": "Profe Benjamin",
+      "handle": "@profeBenjamin",
+      "role": "Profesor",
+      "photo": "",
+      "order": 6
+    },
+    {
+      "name": "Profe Edu",
+      "handle": "@profeEdu",
+      "role": "Profesor",
+      "photo": "",
+      "order": 1
+    },
+    {
+      "name": "Profesor Daniel",
+      "handle": "@profesorDaniel",
+      "role": "Profesor",
+      "photo": "",
+      "order": 5
+    },
+    {
+      "name": "Raul",
+      "handle": "@psicologoRaul",
+      "role": "Psicólogo",
+      "photo": "",
+      "order": 7
+    },
+    {
+      "name": "Robert",
+      "handle": "@psicologoRobert",
+      "role": "Psicólogo",
+      "photo": "",
+      "order": 9
+    }
+  ],
+  "aliados": [
+    {
+      "name": "Acuerdo Basado En Plantas",
+      "handle": "@acuerdobasadoenplantas",
+      "url": "https://www.instagram.com/acuerdobasadoenplantas/",
+      "order": 5
+    },
+    {
+      "name": "Educere UNMSM",
+      "handle": "@educereunmsm",
+      "url": "https://www.instagram.com/educereunmsm/",
+      "order": 2
+    },
+    {
+      "name": "Jan Vegan Market",
+      "handle": "@janveganmarket",
+      "url": "https://www.instagram.com/janveganmarket/",
+      "order": 3
+    },
+    {
+      "name": "Mallki Wasi Ecovida",
+      "handle": "@mallkiwasiecovida",
+      "url": "https://www.instagram.com/mallkiwasiecovida/",
+      "order": 1
+    },
+    {
+      "name": "Salvando 1 Vida",
+      "handle": "@salvando1vida",
+      "url": "https://www.instagram.com/salvando1vida/",
+      "order": 6
+    },
+    {
+      "name": "SENAJU",
+      "handle": "@senajuperu",
+      "url": "https://www.instagram.com/senajuperu/",
+      "order": 7
+    },
+    {
+      "name": "Starrise M",
+      "handle": "@starrise.m",
+      "url": "https://www.instagram.com/starrise.m/",
+      "order": 4
+    }
+  ],
+  "valores": [
+    {
+      "title": "Confidencialidad",
+      "description": "Protegemos la información personal y emocional de los participantes, garantizando un espacio seguro.",
+      "order": 5
+    },
+    {
+      "title": "Crecimiento personal",
+      "description": "Promovemos el aprendizaje constante, el autodescubrimiento y la superación, priorizando la salud mental, emocional y social.",
+      "order": 3
+    },
+    {
+      "title": "Empoderamiento y Liderazgo",
+      "description": "Brindamos a los jóvenes herramientas para tomar el control de su desarrollo y decisiones, fomentando la confianza, la autonomía y la autoeficacia.",
+      "order": 2
+    },
+    {
+      "title": "Inclusión",
+      "description": "Generamos espacios accesibles y libres de estigmas, donde todas las personas se sientan aceptadas.",
+      "order": 9
+    },
+    {
+      "title": "Integridad",
+      "description": "La transparencia y la ética son la base de nuestras interacciones; construimos relaciones sólidas basadas en la honestidad y la confianza.",
+      "order": 1
+    },
+    {
+      "title": "Respeto",
+      "description": "Valoramos la diversidad de pensamientos, culturas, identidades y experiencias, sin discriminación.",
+      "order": 6
+    },
+    {
+      "title": "Responsabilidad social",
+      "description": "Nos comprometemos activamente con el bienestar psicológico y el desarrollo de la comunidad.",
+      "order": 7
+    },
+    {
+      "title": "Solidaridad",
+      "description": "Promovemos el apoyo mutuo, la cooperación y el acompañamiento entre jóvenes y comunidades.",
+      "order": 8
+    },
+    {
+      "title": "Trabajo en Equipo",
+      "description": "Fomentamos la colaboración y la creatividad, permitiendo que cada miembro aporte su perspectiva única.",
+      "order": 4
+    }
+  ],
+  "donaciones": {
+    "intro": "Tu aporte hace posible que más adolescentes y jóvenes accedan a talleres, dinámicas y espacios seguros para cuidar su salud mental. Cada donación, por pequeña que sea, se convierte en bienestar para nuestra comunidad.",
+    "yapeNumero": "",
+    "plinNumero": "",
+    "paypalUrl": "",
+    "cuentas": [],
+    "impactos": [
+      {
+        "monto": "S/ 20",
+        "descripcion": "Materiales para una dinámica grupal en un parque de Lima."
+      },
+      {
+        "monto": "S/ 50",
+        "descripcion": "Kit completo de materiales para un taller psicoeducativo de 20 jóvenes."
+      },
+      {
+        "monto": "S/ 100",
+        "descripcion": "Una edición especial con especialistas invitados en salud mental."
+      }
+    ]
+  }
+}

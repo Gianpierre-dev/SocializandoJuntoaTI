@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RolUsuario {
+  ADMINISTRADOR
+  EDITOR
+}
+
+enum Modalidad {
+  PRESENCIAL
+  ONLINE
+  MIXTO
+}
+
+enum EstadoActividad {
+  ACTIVA
+  EN_DESARROLLO
+}
+
+enum VarianteColor {
+  BRAND
+  GOLD
+  ROSE
+  GREEN
+  DEEP
+  SUBTLE
+}
+
+model Usuario {
+  id           String     @id @default(uuid())
+  correo       String     @unique
+  contrasena   String
+  nombre       String
+  rol          RolUsuario @default(EDITOR)
+  activo       Boolean    @default(true)
+  creadoEn     DateTime   @default(now())
+  actualizadoEn DateTime  @updatedAt
+
+  @@map("usuarios")
+}
+
+model Banner {
+  id               String        @id @default(uuid())
+  titulo           String
+  etiqueta         String
+  descripcion      String?
+  enlace           String
+  textoBoton       String?
+  variante         VarianteColor @default(BRAND)
+  imagenUrl        String?
+  textoAlternativo String?
+  orden            Int
+  activo           Boolean       @default(true)
+  creadoEn         DateTime      @default(now())
+  actualizadoEn    DateTime      @updatedAt
+
+  @@map("banners")
+}
+
+model Programa {
+  id               String        @id @default(uuid())
+  titulo           String
+  subtitulo        String
+  enlace           String
+  variante         VarianteColor @default(BRAND)
+  imagenUrl        String?
+  textoAlternativo String?
+  orden            Int
+  activo           Boolean       @default(true)
+  creadoEn         DateTime      @default(now())
+  actualizadoEn    DateTime      @updatedAt
+
+  @@map("programas")
+}
+
+model Actividad {
+  id            String          @id @default(uuid())
+  titulo        String
+  resumen       String
+  descripcion   String
+  costo         String
+  modalidad     Modalidad
+  estado        EstadoActividad @default(ACTIVA)
+  orden         Int
+  creadoEn      DateTime        @default(now())
+  actualizadoEn DateTime        @updatedAt
+
+  @@map("actividades")
+}
+
+model MiembroEquipo {
+  id            String   @id @default(uuid())
+  nombre        String
+  usuarioRedes  String
+  rol           String
+  fotoUrl       String?
+  orden         Int
+  creadoEn      DateTime @default(now())
+  actualizadoEn DateTime @updatedAt
+
+  @@map("miembros_equipo")
+}
+
+model Aliado {
+  id            String   @id @default(uuid())
+  nombre        String
+  usuarioRedes  String
+  enlace        String?
+  orden         Int
+  creadoEn      DateTime @default(now())
+  actualizadoEn DateTime @updatedAt
+
+  @@map("aliados")
+}
+
+model Valor {
+  id            String   @id @default(uuid())
+  titulo        String
+  descripcion   String
+  orden         Int
+  creadoEn      DateTime @default(now())
+  actualizadoEn DateTime @updatedAt
+
+  @@map("valores")
+}
+
+model ConfiguracionDonaciones {
+  id            Int      @id @default(1)
+  intro         String
+  yapeNumero    String?
+  yapeQrUrl     String?
+  plinNumero    String?
+  plinQrUrl     String?
+  paypalUrl     String?
+  actualizadoEn DateTime @updatedAt
+
+  cuentas  CuentaBancaria[]
+  impactos EjemploImpacto[]
+
+  @@map("configuracion_donaciones")
+}
+
+model CuentaBancaria {
+  id              String                  @id @default(uuid())
+  banco           String
+  titular         String
+  numero          String
+  cci             String
+  orden           Int
+  configuracion   ConfiguracionDonaciones @relation(fields: [configuracionId], references: [id], onDelete: Cascade)
+  configuracionId Int
+
+  @@map("cuentas_bancarias")
+}
+
+model EjemploImpacto {
+  id              String                  @id @default(uuid())
+  monto           String
+  descripcion     String
+  orden           Int
+  configuracion   ConfiguracionDonaciones @relation(fields: [configuracionId], references: [id], onDelete: Cascade)
+  configuracionId Int
+
+  @@map("ejemplos_impacto")
+}
