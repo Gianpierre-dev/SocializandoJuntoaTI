@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   GetObjectCommand,
@@ -15,7 +15,24 @@ export interface UrlSubida {
   clave: string;
 }
 
-const EXTENSIONES_PERMITIDAS = new Set(['png', 'jpg', 'jpeg', 'webp', 'svg']);
+// Solo formatos de imagen pasivos. SVG queda excluido a propósito: es
+// contenido activo (puede embeber scripts) y servirlo abriría XSS almacenado.
+export const TIPOS_IMAGEN: Record<string, string> = {
+  png: 'image/png',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  webp: 'image/webp',
+};
+
+const EXTENSIONES_PERMITIDAS = new Set(Object.keys(TIPOS_IMAGEN));
+
+export const CARPETAS_PERMITIDAS = [
+  'banners',
+  'programas',
+  'donaciones',
+  'equipo',
+  'noticias',
+] as const;
 
 @Injectable()
 export class AlmacenamientoService {
@@ -48,13 +65,16 @@ export class AlmacenamientoService {
   ): Promise<UrlSubida> {
     const extensionNormalizada = extension.toLowerCase().replace(/^\./, '');
     if (!EXTENSIONES_PERMITIDAS.has(extensionNormalizada)) {
-      throw new Error(`Extensión no permitida: ${extension}`);
+      throw new BadRequestException(
+        `Extensión no permitida: ${extension}. Formatos aceptados: ${[...EXTENSIONES_PERMITIDAS].join(', ')}`,
+      );
     }
 
     const clave = `${carpeta}/${randomUUID()}.${extensionNormalizada}`;
     const comando = new PutObjectCommand({
       Bucket: this.bucket,
       Key: clave,
+      ContentType: TIPOS_IMAGEN[extensionNormalizada],
     });
 
     const urlSubida = await getSignedUrl(this.cliente, comando, {
