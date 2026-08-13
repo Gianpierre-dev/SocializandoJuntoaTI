@@ -13,6 +13,84 @@ const claseBotonPrimario =
 const claseBotonSecundario =
   "rounded-lg border border-line px-4 py-2 text-sm font-medium text-content hover:bg-subtle";
 
+// Colores reales de cada variante para las muestras en la tabla.
+const COLORES_VARIANTE: Record<string, string> = {
+  BRAND: "#4a3f88",
+  GOLD: "#c39a2b",
+  ROSE: "#d488b1",
+  GREEN: "#5e8a74",
+  DEEP: "#2c2a5e",
+  SUBTLE: "#e6e2f0",
+};
+
+const BADGES_ESTADO: Record<string, string> = {
+  ACTIVA: "bg-green/15 text-green",
+  EN_DESARROLLO: "bg-gold/15 text-gold",
+  PRESENCIAL: "bg-brand/10 text-accent",
+  ONLINE: "bg-green/15 text-green",
+  MIXTO: "bg-rose/20 text-brand-deep",
+};
+
+/** Celda con vida: badges, muestras de color y estados en vez de texto plano. */
+function CeldaValor({
+  campo,
+  registro,
+}: {
+  campo: CampoRecurso;
+  registro: Record<string, unknown>;
+}) {
+  const valor = registro[campo.nombre];
+
+  if (campo.tipo === "booleano") {
+    return valor ? (
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-green/15 px-2.5 py-1 text-xs font-semibold text-green">
+        <span className="h-1.5 w-1.5 rounded-full bg-green" aria-hidden="true" />
+        Visible
+      </span>
+    ) : (
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-content/10 px-2.5 py-1 text-xs font-semibold text-content/50">
+        <span
+          className="h-1.5 w-1.5 rounded-full bg-content/40"
+          aria-hidden="true"
+        />
+        Oculto
+      </span>
+    );
+  }
+
+  if (campo.tipo === "select") {
+    const etiqueta =
+      campo.opciones?.find((o) => o.valor === valor)?.etiqueta ??
+      String(valor ?? "");
+    const colorVariante = COLORES_VARIANTE[String(valor)];
+    if (campo.nombre === "variante" && colorVariante) {
+      return (
+        <span className="inline-flex items-center gap-2 text-content/80">
+          <span
+            className="h-4 w-4 rounded-full border border-line"
+            style={{ backgroundColor: colorVariante }}
+            aria-hidden="true"
+          />
+          {etiqueta}
+        </span>
+      );
+    }
+    const clases = BADGES_ESTADO[String(valor)];
+    if (clases) {
+      return (
+        <span
+          className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${clases}`}
+        >
+          {etiqueta}
+        </span>
+      );
+    }
+    return <>{etiqueta}</>;
+  }
+
+  return <>{String(valor ?? "")}</>;
+}
+
 function CampoImagen({
   campo,
   valor,
@@ -340,6 +418,9 @@ export default function CrudRecurso({ recurso }: { recurso: RecursoConfig }) {
   const [creando, setCreando] = useState(false);
 
   const columnas = recurso.campos.filter((campo) => campo.enTabla);
+  const campoImagen = recurso.campos.find((campo) => campo.tipo === "imagen");
+  const campoTitulo = columnas[0]?.nombre ?? "id";
+  const miniaturaRedonda = recurso.clave === "equipo";
 
   const cargar = useCallback(async () => {
     setCargando(true);
@@ -373,8 +454,18 @@ export default function CrudRecurso({ recurso }: { recurso: RecursoConfig }) {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-content">{recurso.etiqueta}</h1>
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-content">
+            {recurso.etiqueta}
+          </h1>
+          {!cargando && (
+            <p className="mt-0.5 text-sm text-content/50">
+              {registros.length}{" "}
+              {registros.length === 1 ? "registro" : "registros"}
+            </p>
+          )}
+        </div>
         <button
           type="button"
           className={claseBotonPrimario}
@@ -389,12 +480,18 @@ export default function CrudRecurso({ recurso }: { recurso: RecursoConfig }) {
       {cargando ? (
         <p className="mt-6 text-sm text-content/60">Cargando…</p>
       ) : (
-        <div className="mt-6 overflow-x-auto rounded-xl border border-line bg-white">
+        <div className="mt-6 overflow-x-auto rounded-2xl border border-line bg-white shadow-sm">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-line bg-subtle text-content/70">
+            <thead className="border-b border-line bg-subtle/60">
               <tr>
+                {campoImagen && (
+                  <th className="w-20 px-4 py-3" aria-label="Imagen" />
+                )}
                 {columnas.map((campo) => (
-                  <th key={campo.nombre} className="px-4 py-3 font-semibold">
+                  <th
+                    key={campo.nombre}
+                    className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-content/50"
+                  >
                     {campo.etiqueta}
                   </th>
                 ))}
@@ -402,49 +499,94 @@ export default function CrudRecurso({ recurso }: { recurso: RecursoConfig }) {
               </tr>
             </thead>
             <tbody>
-              {registros.map((registro) => (
-                <tr
-                  key={registro.id}
-                  className="border-b border-line last:border-0"
-                >
-                  {columnas.map((campo) => (
-                    <td key={campo.nombre} className="px-4 py-3 text-content">
-                      {campo.tipo === "booleano" ? (
-                        registro[campo.nombre] ? (
-                          "Sí"
+              {registros.map((registro) => {
+                const urlImagen = campoImagen
+                  ? String(registro[campoImagen.nombre] ?? "")
+                  : "";
+                const inicial = String(registro[campoTitulo] ?? "?")
+                  .trim()
+                  .charAt(0)
+                  .toUpperCase();
+                return (
+                  <tr
+                    key={registro.id}
+                    className="border-b border-line transition-colors last:border-0 hover:bg-subtle/50"
+                  >
+                    {campoImagen && (
+                      <td className="px-4 py-2.5">
+                        {urlImagen ? (
+                          <img
+                            src={urlImagen}
+                            alt=""
+                            loading="lazy"
+                            className={`h-11 w-14 border border-line object-cover ${
+                              miniaturaRedonda
+                                ? "h-11 w-11 rounded-full"
+                                : "rounded-lg"
+                            }`}
+                          />
                         ) : (
-                          <span className="text-content/50">No</span>
-                        )
-                      ) : (
-                        String(registro[campo.nombre] ?? "")
-                      )}
+                          <span
+                            className={`flex h-11 w-14 items-center justify-center bg-brand/10 text-base font-bold text-accent ${
+                              miniaturaRedonda
+                                ? "h-11 w-11 rounded-full"
+                                : "rounded-lg"
+                            }`}
+                            aria-hidden="true"
+                          >
+                            {inicial}
+                          </span>
+                        )}
+                      </td>
+                    )}
+                    {columnas.map((campo, indice) => (
+                      <td
+                        key={campo.nombre}
+                        className={`px-4 py-2.5 ${
+                          indice === 0
+                            ? "font-semibold text-content"
+                            : "text-content/70"
+                        }`}
+                      >
+                        <CeldaValor campo={campo} registro={registro} />
+                      </td>
+                    ))}
+                    <td className="px-4 py-2.5 text-right">
+                      <div className="inline-flex gap-2">
+                        <button
+                          type="button"
+                          className="rounded-lg bg-subtle px-3 py-1.5 text-xs font-semibold text-accent transition-colors hover:bg-brand hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                          onClick={() => setEditando(registro)}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          type="button"
+                          className="rounded-lg px-3 py-1.5 text-xs font-semibold text-red-600 transition-colors hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
+                          onClick={() => void eliminar(registro)}
+                        >
+                          Eliminar
+                        </button>
+                      </div>
                     </td>
-                  ))}
-                  <td className="px-4 py-3 text-right">
-                    <button
-                      type="button"
-                      className="mr-3 font-medium text-accent hover:underline"
-                      onClick={() => setEditando(registro)}
-                    >
-                      Editar
-                    </button>
-                    <button
-                      type="button"
-                      className="font-medium text-red-600 hover:underline"
-                      onClick={() => void eliminar(registro)}
-                    >
-                      Eliminar
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                  </tr>
+                );
+              })}
               {registros.length === 0 && (
                 <tr>
                   <td
-                    colSpan={columnas.length + 1}
-                    className="px-4 py-8 text-center text-content/50"
+                    colSpan={columnas.length + (campoImagen ? 2 : 1)}
+                    className="px-4 py-12 text-center"
                   >
-                    Sin registros todavía.
+                    <p className="text-3xl" aria-hidden="true">
+                      🗂️
+                    </p>
+                    <p className="mt-2 font-medium text-content/60">
+                      Sin registros todavía
+                    </p>
+                    <p className="mt-1 text-sm text-content/40">
+                      Usa el botón «+ Agregar» para crear el primero.
+                    </p>
                   </td>
                 </tr>
               )}
