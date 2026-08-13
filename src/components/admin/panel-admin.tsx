@@ -199,16 +199,99 @@ export default function PanelAdmin() {
     Boolean(obtenerToken()),
   );
   const [seccion, setSeccion] = useState(SECCIONES[0].clave);
+  const [menuAbierto, setMenuAbierto] = useState(false);
 
   if (!autenticado) {
     return <PantallaLogin onIngreso={() => setAutenticado(true)} />;
   }
 
   const recursoActivo = RECURSOS.find((recurso) => recurso.clave === seccion);
+  const seccionActiva = SECCIONES.find((s) => s.clave === seccion);
+
+  const salir = () => {
+    cerrarSesion();
+    setAutenticado(false);
+  };
+
+  const navegacion = (
+    <>
+      {SECCIONES.map((s) => (
+        <button
+          key={s.clave}
+          type="button"
+          onClick={() => {
+            setSeccion(s.clave);
+            setMenuAbierto(false);
+          }}
+          className={`mb-1 block w-full rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors ${
+            seccion === s.clave
+              ? "bg-white/15 text-white"
+              : "text-white/70 hover:bg-white/10 hover:text-white"
+          }`}
+        >
+          {s.etiqueta}
+        </button>
+      ))}
+    </>
+  );
 
   return (
-    <div className="flex min-h-screen bg-subtle">
-      <aside className="flex w-60 shrink-0 flex-col border-r border-line bg-brand-deep">
+    <div className="flex min-h-screen flex-col bg-subtle md:flex-row">
+      {/* Barra superior móvil */}
+      <header className="sticky top-0 z-40 flex items-center justify-between gap-3 border-b border-white/10 bg-brand-deep px-4 py-3 md:hidden">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <img
+            src="/favicon.png?v=3"
+            alt=""
+            width="32"
+            height="32"
+            className="h-8 w-8 shrink-0"
+          />
+          <p className="truncate text-sm font-bold text-white">
+            {seccionActiva?.etiqueta ?? "Panel"}
+          </p>
+        </div>
+        <button
+          type="button"
+          aria-label={menuAbierto ? "Cerrar menú" : "Abrir menú"}
+          aria-expanded={menuAbierto}
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+          onClick={() => setMenuAbierto((v) => !v)}
+        >
+          <svg
+            className="h-6 w-6"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            aria-hidden="true"
+          >
+            {menuAbierto ? (
+              <path d="M6 6l12 12M6 18L18 6" />
+            ) : (
+              <path d="M3 6h18M3 12h18M3 18h18" />
+            )}
+          </svg>
+        </button>
+      </header>
+
+      {/* Menú móvil desplegable */}
+      {menuAbierto && (
+        <div className="fixed inset-0 top-[57px] z-30 bg-brand-deep p-4 md:hidden">
+          <nav aria-label="Secciones del panel">{navegacion}</nav>
+          <button
+            type="button"
+            className="mt-4 w-full rounded-lg border border-white/20 px-3 py-2.5 text-sm font-medium text-white/70 hover:text-white"
+            onClick={salir}
+          >
+            Cerrar sesión
+          </button>
+        </div>
+      )}
+
+      {/* Sidebar de escritorio */}
+      <aside className="hidden w-60 shrink-0 flex-col border-r border-line bg-brand-deep md:flex">
         <div className="flex items-center gap-3 px-5 py-6">
           <img
             src="/favicon.png?v=3"
@@ -225,29 +308,13 @@ export default function PanelAdmin() {
           </div>
         </div>
         <nav className="flex-1 px-2" aria-label="Secciones del panel">
-          {SECCIONES.map((s) => (
-            <button
-              key={s.clave}
-              type="button"
-              onClick={() => setSeccion(s.clave)}
-              className={`mb-1 block w-full rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors ${
-                seccion === s.clave
-                  ? "bg-white/15 text-white"
-                  : "text-white/70 hover:bg-white/10 hover:text-white"
-              }`}
-            >
-              {s.etiqueta}
-            </button>
-          ))}
+          {navegacion}
         </nav>
         <div className="border-t border-white/10 p-4">
           <button
             type="button"
             className="text-sm font-medium text-white/70 hover:text-white"
-            onClick={() => {
-              cerrarSesion();
-              setAutenticado(false);
-            }}
+            onClick={salir}
           >
             Cerrar sesión
           </button>

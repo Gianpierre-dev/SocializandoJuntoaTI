@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { api, subirImagen } from "./api";
 import type { CampoRecurso, RecursoConfig } from "./recursos";
 
@@ -96,6 +96,19 @@ function Formulario({
   });
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState("");
+  const cuerpoRef = useRef<HTMLDivElement>(null);
+
+  // Foco al primer campo al abrir; Escape cierra.
+  useEffect(() => {
+    cuerpoRef.current
+      ?.querySelector<HTMLElement>("input, select, textarea")
+      ?.focus();
+    const alTeclear = (evento: KeyboardEvent) => {
+      if (evento.key === "Escape") onCancelar();
+    };
+    document.addEventListener("keydown", alTeclear);
+    return () => document.removeEventListener("keydown", alTeclear);
+  }, [onCancelar]);
 
   const fijar = (nombre: string, valor: unknown) =>
     setValores((prev) => ({ ...prev, [nombre]: valor }));
@@ -133,17 +146,45 @@ function Formulario({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4 sm:p-8"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center sm:p-6"
       role="dialog"
       aria-modal="true"
       aria-label={registro ? "Editar registro" : "Nuevo registro"}
+      onClick={(evento) => {
+        if (evento.target === evento.currentTarget) onCancelar();
+      }}
     >
-      <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
-        <h2 className="text-lg font-bold text-content">
-          {registro ? "Editar" : "Nuevo"} · {recurso.etiqueta}
-        </h2>
+      <div className="flex max-h-[92dvh] w-full flex-col rounded-t-2xl bg-white shadow-xl sm:max-w-lg sm:rounded-2xl">
+        {/* Header fijo del modal */}
+        <header className="flex shrink-0 items-center justify-between gap-4 border-b border-line px-5 py-4 sm:px-6">
+          <h2 className="text-lg font-bold text-content">
+            {registro ? "Editar" : "Nuevo"} · {recurso.etiqueta}
+          </h2>
+          <button
+            type="button"
+            aria-label="Cerrar"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-content/60 hover:bg-subtle hover:text-content focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+            onClick={onCancelar}
+          >
+            <svg
+              className="h-5 w-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              aria-hidden="true"
+            >
+              <path d="M6 6l12 12M6 18L18 6" />
+            </svg>
+          </button>
+        </header>
 
-        <div className="mt-4 space-y-4">
+        {/* Cuerpo scrolleable */}
+        <div
+          ref={cuerpoRef}
+          className="flex-1 space-y-4 overflow-y-auto px-5 py-4 sm:px-6"
+        >
           {recurso.campos.map((campo) => (
             <div key={campo.nombre}>
               <label className="mb-1 block text-sm font-medium text-content">
@@ -210,25 +251,31 @@ function Formulario({
           ))}
         </div>
 
-        {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
-
-        <div className="mt-6 flex justify-end gap-3">
-          <button
-            type="button"
-            className={claseBotonSecundario}
-            onClick={onCancelar}
-          >
-            Cancelar
-          </button>
-          <button
-            type="button"
-            className={claseBotonPrimario}
-            onClick={() => void guardar()}
-            disabled={guardando}
-          >
-            {guardando ? "Guardando…" : "Guardar"}
-          </button>
-        </div>
+        {/* Footer fijo del modal con las acciones */}
+        <footer className="shrink-0 border-t border-line px-5 py-4 sm:px-6">
+          {error && (
+            <p role="alert" className="mb-3 text-sm text-red-600">
+              {error}
+            </p>
+          )}
+          <div className="flex justify-end gap-3">
+            <button
+              type="button"
+              className={claseBotonSecundario}
+              onClick={onCancelar}
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              className={claseBotonPrimario}
+              onClick={() => void guardar()}
+              disabled={guardando}
+            >
+              {guardando ? "Guardando…" : "Guardar"}
+            </button>
+          </div>
+        </footer>
       </div>
     </div>
   );
