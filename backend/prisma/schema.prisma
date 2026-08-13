@@ -130,6 +130,20 @@ model Valor {
   @@map("valores")
 }
 
+model Postulacion {
+  id             String   @id @default(uuid())
+  nombre         String
+  edad           Int
+  correo         String
+  celular        String
+  area           String
+  disponibilidad String
+  mensaje        String?
+  creadoEn       DateTime @default(now())
+
+  @@map("postulaciones")
+}
+
 model ConfiguracionDonaciones {
   id            Int      @id @default(1)
   intro         String

@@ -9,7 +9,7 @@
   --color-brand-deep: #2c2a5e; /* dark anchor — dark sections, footer */
   --color-gold: #c39a2b; /* gold — CTAs and accents */
   --color-rose: #d488b1; /* soft pink */
-  --color-green: #6fa088; /* green */
+  --color-green: #5e8a74; /* green (oscurecido para contraste AA con texto brand-deep) */
 
   /* Accent text (flips in dark for legibility) */
   --color-accent: #4a3f88;

@@ -1,5 +1,5 @@
 ---
-import { getCollection } from "astro:content";
+import { obtenerActividades } from "../../lib/api-publica";
 import SectionHeading from "../ui/section-heading.astro";
 import ActivityCard from "../ui/activity-card.astro";
 import Button from "../ui/button.astro";
@@ -10,9 +10,7 @@ interface Props {
 
 const { limit } = Astro.props;
 
-const activities = (await getCollection("activities")).sort(
-  (a, b) => a.data.order - b.data.order,
-);
+const activities = await obtenerActividades();
 
 const visibleActivities =
   typeof limit === "number" ? activities.slice(0, limit) : activities;
@@ -32,11 +30,11 @@ const hasMore = typeof limit === "number" && activities.length > limit;
         <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {visibleActivities.map((activity) => (
             <ActivityCard
-              title={activity.data.title}
-              summary={activity.data.summary}
-              cost={activity.data.cost}
-              modality={activity.data.modality}
-              status={activity.data.status}
+              title={activity.titulo}
+              summary={activity.resumen}
+              cost={activity.costo}
+              modality={activity.modalidad}
+              status={activity.proximamente ? "in-development" : "active"}
             />
           ))}
         </div>

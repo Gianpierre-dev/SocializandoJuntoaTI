@@ -1,23 +1,20 @@
 ---
 // Cuerpo tipo portal institucional: destacado + notas de prensa a la izquierda,
-// mosaico de accesos a programas a la derecha (configurable en src/content/programas).
-import { Image } from "astro:assets";
-import { getCollection } from "astro:content";
+// mosaico de accesos a programas a la derecha (administrado desde el panel).
+import { obtenerProgramas } from "../../lib/api-publica";
 import { site } from "../../data/site";
 
-const programas = (await getCollection("programas")).sort(
-  (a, b) => a.data.order - b.data.order,
-);
+const programas = await obtenerProgramas();
 
 // Estilos por variante para tiles sin imagen.
-const variantClasses = {
+const variantClasses: Record<string, string> = {
   brand: "bg-brand text-white",
   gold: "bg-gold text-brand-deep",
   rose: "bg-rose text-brand-deep",
   green: "bg-green text-brand-deep",
   deep: "bg-brand-deep text-white",
   subtle: "bg-subtle text-accent ring-1 ring-line",
-} as const;
+};
 ---
 
 <section class="bg-page pb-16" aria-label="Programas y noticias">
@@ -68,33 +65,34 @@ const variantClasses = {
       </div>
 
       <!-- Columna derecha: mosaico de programas -->
-      <ul class="grid grid-cols-2 gap-4">
+      <ul class="grid grid-cols-2 gap-3 sm:gap-4">
         {
           programas.map((programa) => (
             <li>
-              {programa.data.image ? (
+              {programa.imagenUrl ? (
                 <a
-                  href={programa.data.href}
+                  href={programa.enlace}
                   class="block overflow-hidden rounded-xl shadow-sm transition-transform hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
                 >
-                  <Image
-                    src={programa.data.image}
-                    alt={programa.data.alt ?? programa.data.title}
-                    widths={[320, 640, 924]}
-                    sizes="(max-width: 640px) 50vw, 280px"
+                  <img
+                    src={programa.imagenUrl}
+                    alt={programa.textoAlternativo ?? programa.titulo}
+                    width="924"
+                    height="616"
+                    loading="lazy"
                     class="aspect-[3/2] w-full object-cover"
                   />
                 </a>
               ) : (
                 <a
-                  href={programa.data.href}
-                  class={`flex aspect-[8/5] flex-col justify-end rounded-xl p-5 shadow-sm transition-transform hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 ${variantClasses[programa.data.variant]}`}
+                  href={programa.enlace}
+                  class={`flex aspect-[8/5] flex-col justify-end rounded-xl p-4 shadow-sm transition-transform hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 sm:p-5 ${variantClasses[programa.variante] ?? variantClasses.brand}`}
                 >
-                  <span class="text-lg font-bold leading-tight sm:text-xl">
-                    {programa.data.title}
+                  <span class="text-base font-bold leading-tight sm:text-xl">
+                    {programa.titulo}
                   </span>
                   <span class="mt-1 text-sm font-medium opacity-80">
-                    {programa.data.subtitle}
+                    {programa.subtitulo}
                   </span>
                 </a>
               )}

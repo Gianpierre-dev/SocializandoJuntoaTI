@@ -1,16 +1,24 @@
 ---
-import { getCollection } from "astro:content";
+import { obtenerEquipo } from "../../lib/api-publica";
 import SectionHeading from "../ui/section-heading.astro";
+import Button from "../ui/button.astro";
 
-const team = (await getCollection("team")).sort(
-  (a, b) => a.data.order - b.data.order,
-);
+interface Props {
+  /** Limita la cantidad mostrada (portada) y agrega enlace al equipo completo. */
+  limit?: number;
+}
 
-const getInitial = (name: string) =>
-  name.trim().charAt(0).toUpperCase() || "?";
+const { limit } = Astro.props;
+
+const team = await obtenerEquipo();
+const visibles = typeof limit === "number" ? team.slice(0, limit) : team;
+const hayMas = typeof limit === "number" && team.length > limit;
+
+const getInitial = (nombre: string) =>
+  nombre.trim().charAt(0).toUpperCase() || "?";
 ---
 
-<section class="bg-surface py-16 sm:py-20">
+<section class="bg-surface py-16 sm:py-20" id="equipo">
   <div class="mx-auto max-w-6xl px-4 sm:px-6">
     <SectionHeading
       title="Nuestro equipo"
@@ -18,32 +26,51 @@ const getInitial = (name: string) =>
     />
 
     {
-      team.length > 0 ? (
-        <ul class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {team.map((member) => (
+      visibles.length > 0 ? (
+        <ul class="mt-12 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
+          {visibles.map((miembro) => (
             <li class="flex flex-col items-center text-center">
-              <div
-                class="flex h-24 w-24 items-center justify-center rounded-full bg-brand/10 text-3xl font-semibold text-accent"
-                aria-hidden="true"
-              >
-                {getInitial(member.data.name)}
-              </div>
-              <h3 class="mt-4 font-semibold text-content">
-                {member.data.name}
-              </h3>
-              <p class="text-sm text-accent">{member.data.role}</p>
-              {member.data.handle && (
-                <p class="mt-1 text-sm text-content/60">
-                  {member.data.handle}
-                </p>
+              {miembro.fotoUrl ? (
+                <img
+                  src={miembro.fotoUrl}
+                  alt={`Foto de ${miembro.nombre}`}
+                  width="96"
+                  height="96"
+                  loading="lazy"
+                  class="h-20 w-20 rounded-full object-cover sm:h-24 sm:w-24"
+                />
+              ) : (
+                <div
+                  class="flex h-20 w-20 items-center justify-center rounded-full bg-brand/10 text-3xl font-semibold text-accent sm:h-24 sm:w-24"
+                  aria-hidden="true"
+                >
+                  {getInitial(miembro.nombre)}
+                </div>
+              )}
+              <p class="mt-3 font-semibold text-content">{miembro.nombre}</p>
+              <p class="text-sm text-content/60">{miembro.rol}</p>
+              {miembro.usuarioRedes && (
+                <p class="text-xs text-content/50">{miembro.usuarioRedes}</p>
               )}
             </li>
           ))}
         </ul>
       ) : (
         <p class="mt-12 text-center text-content/60">
-          Pronto conocerás a nuestro equipo.
+          Pronto presentaremos a nuestro equipo.
         </p>
+      )
+    }
+
+    {
+      hayMas && (
+        <div class="mt-10 text-center">
+          <Button
+            href="/nosotros#equipo"
+            variant="ghost"
+            label="Conoce a todo el equipo"
+          />
+        </div>
       )
     }
   </div>

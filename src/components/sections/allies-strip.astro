@@ -1,10 +1,8 @@
 ---
-import { getCollection } from "astro:content";
+import { obtenerAliados } from "../../lib/api-publica";
 import SectionHeading from "../ui/section-heading.astro";
 
-const allies = (await getCollection("allies")).sort(
-  (a, b) => a.data.order - b.data.order,
-);
+const allies = await obtenerAliados();
 ---
 
 {
@@ -21,11 +19,11 @@ const allies = (await getCollection("allies")).sort(
             const content = (
               <span class="block text-center">
                 <span class="block font-semibold text-content">
-                  {ally.data.name}
+                  {ally.nombre}
                 </span>
-                {ally.data.handle && (
+                {ally.usuarioRedes && (
                   <span class="block text-sm text-content/60">
-                    {ally.data.handle}
+                    {ally.usuarioRedes}
                   </span>
                 )}
               </span>
@@ -33,9 +31,9 @@ const allies = (await getCollection("allies")).sort(
 
             return (
               <li>
-                {ally.data.url ? (
+                {ally.enlace ? (
                   <a
-                    href={ally.data.url}
+                    href={ally.enlace}
                     target="_blank"
                     rel="noopener noreferrer"
                     class="block rounded-2xl border border-line bg-surface px-6 py-4 shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"

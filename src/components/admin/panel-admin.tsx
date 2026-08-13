@@ -3,6 +3,7 @@ import { cerrarSesion, iniciarSesion, obtenerToken } from "./api";
 import { RECURSOS } from "./recursos";
 import CrudRecurso from "./crud-recurso";
 import FormDonaciones from "./form-donaciones";
+import ListaPostulaciones from "./lista-postulaciones";
 
 function IconoOjo({ tachado }: { tachado: boolean }) {
   return (
@@ -183,6 +184,7 @@ function PantallaLogin({ onIngreso }: { onIngreso: () => void }) {
 }
 
 const SECCIONES = [
+  { clave: "postulaciones", etiqueta: "Postulaciones" },
   ...RECURSOS.map((recurso) => ({
     clave: recurso.clave,
     etiqueta: recurso.etiqueta,
@@ -253,6 +255,8 @@ export default function PanelAdmin() {
       <main className="flex-1 overflow-x-auto p-6 sm:p-10">
         {recursoActivo ? (
           <CrudRecurso key={recursoActivo.clave} recurso={recursoActivo} />
+        ) : seccion === "postulaciones" ? (
+          <ListaPostulaciones />
         ) : (
           <FormDonaciones />
         )}

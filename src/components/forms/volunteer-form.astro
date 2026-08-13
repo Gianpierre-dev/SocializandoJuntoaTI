@@ -1,352 +1,282 @@
 ---
+// Formulario de postulación: 7 campos esenciales, validación accesible y
+// envío a la API del backend. Lo demás se conversa en la entrevista.
 import { site } from "../../data/site";
+import { API_PUBLICA_URL } from "../../lib/api-publica";
+import SectionHeading from "../ui/section-heading.astro";
 
-const endpoint = site.volunteerEndpoint ?? "";
-
-// Field names double as Google Sheet column headers (set by the Apps Script).
-const studyYears = ["1° - 3° año", "4° - 5° año", "Ya egresé"];
-
-const volunteerTypes = [
-  {
-    value: "Líder voluntario(a)",
-    description: "Coordina, guía, motiva y toma decisiones junto con el equipo.",
-  },
-  {
-    value: "Voluntario(a)",
-    description: "Apoya activamente en las actividades del equipo.",
-  },
+const DISPONIBILIDADES = [
+  "Fines de semana (3 a 5 horas)",
+  "Entre semana",
+  "Horario flexible",
 ];
 
-const interestAreas = [
-  { value: "Proyectos", description: "Desarrollo de talleres, dinámicas y manualidades." },
-  { value: "Marketing", description: "Estrategias para fidelizar al público objetivo." },
-  { value: "RR. HH. y Comunicaciones", description: "Gestión del talento y buen clima de equipo." },
-  { value: "Capacitación Académica", description: "Grupo de estudio para fortalecer conocimientos." },
-  { value: "Relaciones Públicas", description: "Imagen de la organización ante el público." },
-  { value: "Logística", description: "Planificación de recursos materiales y humanos." },
-  { value: "Otros", description: "Otra área de interés." },
-];
-
-const permanence = [
-  { value: "3 meses", description: "Experiencias." },
-  { value: "6 meses", description: "Experiencias + certificado." },
-  { value: "1 año", description: "Experiencias + certificado + ser director(a) de SJAT." },
-];
-
-const fieldClass =
-  "mt-2 w-full rounded-xl border border-line bg-surface px-4 py-3 text-base text-content shadow-sm transition-colors placeholder:text-content/40 focus:border-accent focus:outline-none focus:ring-2 focus:ring-brand/40";
-const labelClass = "block text-sm font-semibold text-content";
-const legendClass = "text-sm font-semibold text-content";
-const optionClass =
-  "flex cursor-pointer items-start gap-3 rounded-xl border border-line bg-surface p-3 transition-colors hover:border-accent/40 has-[:checked]:border-accent has-[:checked]:bg-subtle";
+const claseInput =
+  "mt-1 w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-base text-content transition-shadow focus:outline-none focus:ring-2 focus:ring-brand aria-[invalid]:border-red-500";
 ---
 
-<section id="postular" class="scroll-mt-24 bg-subtle py-16 sm:py-20">
-  <div class="mx-auto max-w-3xl px-4 sm:px-6">
-    <div class="text-center">
-      <h2 class="text-3xl font-bold text-content sm:text-4xl">
-        Postula como voluntario
-      </h2>
-      <p class="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-content/70">
-        Completa el formulario y nos pondremos en contacto contigo. Los campos
-        marcados con <span class="text-gold">*</span> son obligatorios.
+<section class="bg-surface py-16 sm:py-20" id="postular">
+  <div class="mx-auto max-w-2xl px-4 sm:px-6">
+    <SectionHeading
+      title="Postula aquí"
+      subtitle="Completa estos datos y te contactamos por WhatsApp para conversar. Toma menos de 2 minutos."
+    />
+
+    <form id="form-voluntariado" class="mt-10 space-y-5" novalidate>
+      <div class="grid gap-5 sm:grid-cols-[1fr_8rem]">
+        <div>
+          <label for="campo-nombre" class="block text-sm font-medium text-content">
+            Nombre completo
+          </label>
+          <input
+            id="campo-nombre"
+            name="nombre"
+            type="text"
+            autocomplete="name"
+            required
+            minlength="3"
+            class={claseInput}
+          />
+          <p class="mt-1 hidden text-sm text-red-600" data-error-para="campo-nombre"></p>
+        </div>
+        <div>
+          <label for="campo-edad" class="block text-sm font-medium text-content">
+            Edad
+          </label>
+          <input
+            id="campo-edad"
+            name="edad"
+            type="number"
+            inputmode="numeric"
+            min="14"
+            max="99"
+            required
+            class={claseInput}
+          />
+          <p class="mt-1 hidden text-sm text-red-600" data-error-para="campo-edad"></p>
+        </div>
+      </div>
+
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label for="campo-correo" class="block text-sm font-medium text-content">
+            Correo electrónico
+          </label>
+          <input
+            id="campo-correo"
+            name="correo"
+            type="email"
+            autocomplete="email"
+            required
+            class={claseInput}
+          />
+          <p class="mt-1 hidden text-sm text-red-600" data-error-para="campo-correo"></p>
+        </div>
+        <div>
+          <label for="campo-celular" class="block text-sm font-medium text-content">
+            Celular (WhatsApp)
+          </label>
+          <input
+            id="campo-celular"
+            name="celular"
+            type="tel"
+            inputmode="tel"
+            autocomplete="tel"
+            required
+            minlength="9"
+            class={claseInput}
+          />
+          <p class="mt-1 hidden text-sm text-red-600" data-error-para="campo-celular"></p>
+        </div>
+      </div>
+
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label for="campo-area" class="block text-sm font-medium text-content">
+            Área de interés
+          </label>
+          <select id="campo-area" name="area" required class={claseInput}>
+            <option value="">Selecciona un área</option>
+            {site.areas.map((area) => (
+              <option value={area.title}>{area.title}</option>
+            ))}
+            <option value="No estoy seguro/a">
+              No estoy seguro/a, oriéntenme
+            </option>
+          </select>
+          <p class="mt-1 hidden text-sm text-red-600" data-error-para="campo-area"></p>
+        </div>
+        <div>
+          <label
+            for="campo-disponibilidad"
+            class="block text-sm font-medium text-content"
+          >
+            Disponibilidad
+          </label>
+          <select
+            id="campo-disponibilidad"
+            name="disponibilidad"
+            required
+            class={claseInput}
+          >
+            <option value="">Selecciona tu disponibilidad</option>
+            {DISPONIBILIDADES.map((opcion) => (
+              <option value={opcion}>{opcion}</option>
+            ))}
+          </select>
+          <p
+            class="mt-1 hidden text-sm text-red-600"
+            data-error-para="campo-disponibilidad"
+          ></p>
+        </div>
+      </div>
+
+      <div>
+        <label for="campo-mensaje" class="block text-sm font-medium text-content">
+          Cuéntanos de ti <span class="text-content/50">(opcional)</span>
+        </label>
+        <textarea
+          id="campo-mensaje"
+          name="mensaje"
+          rows="3"
+          maxlength="1000"
+          placeholder="¿Por qué te interesa el voluntariado? ¿Qué te gustaría aportar?"
+          class={claseInput}></textarea>
+      </div>
+
+      <!-- Honeypot antispam: oculto para personas, tentador para bots -->
+      <div class="absolute left-[-9999px]" aria-hidden="true">
+        <label for="campo-sitio">No completes este campo</label>
+        <input id="campo-sitio" name="sitio" type="text" tabindex="-1" autocomplete="off" />
+      </div>
+
+      <p
+        id="error-general"
+        role="alert"
+        class="hidden rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700"
+      >
+      </p>
+
+      <button
+        type="submit"
+        id="boton-enviar"
+        class="w-full rounded-xl bg-gold px-6 py-3.5 text-base font-semibold text-brand-deep transition-colors hover:bg-gold/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 disabled:opacity-50 sm:w-auto"
+      >
+        Enviar postulación
+      </button>
+      <p class="text-xs leading-relaxed text-content/50">
+        Usaremos tus datos solo para contactarte sobre el voluntariado.
+      </p>
+    </form>
+
+    <div
+      id="mensaje-exito"
+      role="status"
+      class="mt-10 hidden rounded-2xl border border-green/30 bg-green/10 p-8 text-center"
+    >
+      <p class="text-2xl font-bold text-content">¡Postulación recibida! 💜</p>
+      <p class="mx-auto mt-3 max-w-md leading-relaxed text-content/70">
+        Gracias por querer sumarte. Nuestro equipo de Recursos Humanos te
+        escribirá por WhatsApp en los próximos días para coordinar una
+        conversación. Mientras tanto, síguenos en redes para conocernos más.
       </p>
     </div>
-
-    <form
-      id="volunteer-form"
-      data-endpoint={endpoint}
-      novalidate
-      class="mt-10 space-y-8 rounded-3xl bg-surface p-6 shadow-sm sm:p-10"
-    >
-      <!-- Honeypot anti-spam: hidden from humans, tempting for bots -->
-      <div class="absolute left-[-9999px]" aria-hidden="true">
-        <label>No completar este campo
-          <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" />
-        </label>
-      </div>
-
-      <div class="grid gap-6 sm:grid-cols-2">
-        <div class="sm:col-span-2">
-          <label class={labelClass} for="fullName">
-            Nombres y apellidos completos <span class="text-gold">*</span>
-            <span class="block text-xs font-normal text-content/50">
-              Tal como saldrá en tu certificado oficial.
-            </span>
-          </label>
-          <input id="fullName" name="Nombres y Apellidos" type="text" required autocomplete="name" class={fieldClass} />
-        </div>
-
-        <div>
-          <label class={labelClass} for="email">
-            Correo electrónico <span class="text-gold">*</span>
-            <span class="block text-xs font-normal text-content/50">
-              Te enviaremos la confirmación aquí.
-            </span>
-          </label>
-          <input id="email" name="Email" type="email" required autocomplete="email" class={fieldClass} />
-        </div>
-
-        <div>
-          <label class={labelClass} for="whatsapp">
-            Número de WhatsApp <span class="text-gold">*</span>
-          </label>
-          <input id="whatsapp" name="WhatsApp" type="tel" inputmode="tel" required autocomplete="tel" class={fieldClass} />
-        </div>
-
-        <div>
-          <label class={labelClass} for="age">
-            Edad <span class="text-gold">*</span>
-          </label>
-          <input id="age" name="Edad" type="number" min="18" max="35" required class={fieldClass} />
-        </div>
-
-        <div>
-          <label class={labelClass} for="district">
-            Distrito <span class="text-gold">*</span>
-          </label>
-          <input id="district" name="Distrito" type="text" required class={fieldClass} />
-        </div>
-
-        <div class="sm:col-span-2">
-          <label class={labelClass} for="career">
-            Carrera - Universidad o instituto <span class="text-gold">*</span>
-            <span class="block text-xs font-normal text-content/50">
-              Ej.: Medicina - UNMSM
-            </span>
-          </label>
-          <input id="career" name="Carrera y Universidad" type="text" required class={fieldClass} />
-        </div>
-      </div>
-
-      <fieldset>
-        <legend class={legendClass}>
-          Año de estudio que cursas <span class="text-gold">*</span>
-        </legend>
-        <div class="mt-3 grid gap-2 sm:grid-cols-3">
-          {
-            studyYears.map((year) => (
-              <label class={optionClass}>
-                <input type="radio" name="Año de estudio" value={year} required class="mt-1 accent-brand" />
-                <span class="text-sm text-content">{year}</span>
-              </label>
-            ))
-          }
-        </div>
-      </fieldset>
-
-      <fieldset>
-        <legend class={legendClass}>
-          ¿Qué tipo de voluntariado eliges? <span class="text-gold">*</span>
-        </legend>
-        <div class="mt-3 grid gap-2">
-          {
-            volunteerTypes.map((type) => (
-              <label class={optionClass}>
-                <input type="radio" name="Tipo de voluntariado" value={type.value} required class="mt-1 accent-brand" />
-                <span class="text-sm">
-                  <span class="font-semibold text-content">{type.value}</span>
-                  <span class="block text-content/60">{type.description}</span>
-                </span>
-              </label>
-            ))
-          }
-        </div>
-      </fieldset>
-
-      <div>
-        <label class={labelClass} for="motivation">
-          ¿Qué te motiva a formar parte del equipo? <span class="text-gold">*</span>
-        </label>
-        <textarea id="motivation" name="Motivación" rows="3" required class={fieldClass}></textarea>
-      </div>
-
-      <fieldset>
-        <legend class={legendClass}>
-          Áreas de interés <span class="text-gold">*</span>
-          <span class="block text-xs font-normal text-content/50">
-            Elige al menos una.
-          </span>
-        </legend>
-        <div class="mt-3 grid gap-2 sm:grid-cols-2">
-          {
-            interestAreas.map((area) => (
-              <label class={optionClass}>
-                <input type="checkbox" name="Áreas de interés" value={area.value} class="mt-1 accent-brand" data-area />
-                <span class="text-sm">
-                  <span class="font-semibold text-content">{area.value}</span>
-                  <span class="block text-content/60">{area.description}</span>
-                </span>
-              </label>
-            ))
-          }
-        </div>
-        <p id="areas-error" class="mt-2 hidden text-sm text-red-600" role="alert">
-          Selecciona al menos un área de interés.
-        </p>
-      </fieldset>
-
-      <div>
-        <label class={labelClass} for="experience">
-          Tu experiencia y aprendizajes previos <span class="text-gold">*</span>
-          <span class="block text-xs font-normal text-content/50">
-            En otras organizaciones, voluntariados, prácticas, etc.
-          </span>
-        </label>
-        <textarea id="experience" name="Experiencia previa" rows="3" required class={fieldClass}></textarea>
-      </div>
-
-      <fieldset>
-        <legend class={legendClass}>
-          ¿Cuánto tiempo deseas estar con nosotros? <span class="text-gold">*</span>
-        </legend>
-        <div class="mt-3 grid gap-2 sm:grid-cols-3">
-          {
-            permanence.map((option) => (
-              <label class={optionClass}>
-                <input type="radio" name="Tiempo de permanencia" value={option.value} required class="mt-1 accent-brand" />
-                <span class="text-sm">
-                  <span class="font-semibold text-content">{option.value}</span>
-                  <span class="block text-content/60">{option.description}</span>
-                </span>
-              </label>
-            ))
-          }
-        </div>
-      </fieldset>
-
-      <div>
-        <label class={labelClass} for="expectations">
-          Tus expectativas y compromiso para este año <span class="text-gold">*</span>
-        </label>
-        <textarea id="expectations" name="Expectativas" rows="3" required class={fieldClass}></textarea>
-      </div>
-
-      <div>
-        <label class={labelClass} for="finalMessage">
-          ¿Algún mensaje final? <span class="text-xs font-normal text-content/50">(opcional)</span>
-        </label>
-        <textarea id="finalMessage" name="Mensaje final" rows="2" class={fieldClass}></textarea>
-      </div>
-
-      <div class="space-y-4">
-        <p
-          id="form-status"
-          class="hidden rounded-xl px-4 py-3 text-sm"
-          role="status"
-          aria-live="polite"
-        >
-        </p>
-
-        <button
-          type="submit"
-          id="submit-button"
-          class="inline-flex w-full items-center justify-center rounded-full bg-brand px-6 py-3 text-base font-semibold text-white transition-colors hover:bg-brand-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
-        >
-          Enviar postulación
-        </button>
-      </div>
-    </form>
   </div>
 </section>
 
-<script>
-  const form = document.getElementById("volunteer-form") as HTMLFormElement | null;
-  const status = document.getElementById("form-status");
-  const submitButton = document.getElementById("submit-button") as HTMLButtonElement | null;
-  const areasError = document.getElementById("areas-error");
+<script define:vars={{ apiUrl: API_PUBLICA_URL }}>
+  const form = document.getElementById("form-voluntariado");
+  const errorGeneral = document.getElementById("error-general");
+  const exito = document.getElementById("mensaje-exito");
+  const botonEnviar = document.getElementById("boton-enviar");
 
-  if (form && status && submitButton) {
-    const endpoint = form.dataset.endpoint ?? "";
+  const MENSAJES = {
+    "campo-nombre": "Escribe tu nombre completo (mínimo 3 letras).",
+    "campo-edad": "Ingresa tu edad (entre 14 y 99).",
+    "campo-correo": "Ingresa un correo válido.",
+    "campo-celular": "Ingresa tu celular (mínimo 9 dígitos).",
+    "campo-area": "Selecciona un área de interés.",
+    "campo-disponibilidad": "Selecciona tu disponibilidad.",
+  };
 
-    const showStatus = (message: string, kind: "success" | "error") => {
-      status.textContent = message;
-      status.className =
-        kind === "success"
-          ? "rounded-xl bg-green/10 px-4 py-3 text-sm text-green"
-          : "rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700";
-    };
-
-    const validateAreas = () => {
-      const checked = form.querySelectorAll<HTMLInputElement>("input[data-area]:checked");
-      const hasOne = checked.length > 0;
-      areasError?.classList.toggle("hidden", hasOne);
-      return hasOne;
-    };
-
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
-
-      // Honeypot: if a bot filled the hidden field, fake success and stop.
-      const honeypot = form.querySelector<HTMLInputElement>('input[name="_gotcha"]');
-      if (honeypot && honeypot.value.trim() !== "") {
-        showStatus("¡Gracias! Recibimos tu postulación.", "success");
-        form.reset();
-        return;
-      }
-
-      const nativeValid = form.checkValidity();
-      const areasValid = validateAreas();
-
-      if (!nativeValid) {
-        form.reportValidity();
-        return;
-      }
-      if (!areasValid) {
-        areasError?.scrollIntoView({ behavior: "smooth", block: "center" });
-        return;
-      }
-
-      if (!endpoint) {
-        showStatus(
-          "El formulario aún no está configurado. Vuelve a intentarlo más tarde.",
-          "error",
-        );
-        return;
-      }
-
-      // Collapse the multiple "Áreas de interés" values into a single field.
-      const formData = new FormData(form);
-      const params = new URLSearchParams();
-      const areas: string[] = [];
-      for (const [key, value] of formData.entries()) {
-        if (key === "_gotcha") continue;
-        if (key === "Áreas de interés") {
-          areas.push(String(value));
-          continue;
-        }
-        params.append(key, String(value));
-      }
-      if (areas.length > 0) params.append("Áreas de interés", areas.join("; "));
-      params.append("formType", "voluntarios");
-
-      submitButton.disabled = true;
-      submitButton.textContent = "Enviando…";
-      status.classList.add("hidden");
-
-      try {
-        await fetch(endpoint, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: params.toString(),
-        });
-        // no-cors responses are opaque, so we confirm optimistically.
-        form.reset();
-        showStatus(
-          "¡Gracias! Recibimos tu postulación. Te enviamos una confirmación a tu correo.",
-          "success",
-        );
-        status.scrollIntoView({ behavior: "smooth", block: "center" });
-      } catch (error) {
-        showStatus(
-          "No pudimos enviar tu postulación. Revisa tu conexión e inténtalo de nuevo.",
-          "error",
-        );
-      } finally {
-        submitButton.disabled = false;
-        submitButton.textContent = "Enviar postulación";
-      }
+  const limpiarErrores = () => {
+    errorGeneral.classList.add("hidden");
+    form.querySelectorAll("[data-error-para]").forEach((p) => {
+      p.classList.add("hidden");
+      p.textContent = "";
     });
-  }
+    form
+      .querySelectorAll("[aria-invalid]")
+      .forEach((campo) => campo.removeAttribute("aria-invalid"));
+  };
+
+  const marcarError = (campo, mensaje) => {
+    campo.setAttribute("aria-invalid", "true");
+    const p = form.querySelector(`[data-error-para="${campo.id}"]`);
+    if (p) {
+      p.textContent = mensaje;
+      p.classList.remove("hidden");
+      campo.setAttribute("aria-describedby", `${campo.id}-error`);
+      p.id = `${campo.id}-error`;
+    }
+  };
+
+  form?.addEventListener("submit", async (evento) => {
+    evento.preventDefault();
+    limpiarErrores();
+
+    // Honeypot: si un bot lo llenó, fingimos éxito sin enviar nada.
+    if (form.elements.sitio.value) {
+      form.classList.add("hidden");
+      exito.classList.remove("hidden");
+      return;
+    }
+
+    // Validación visible y accesible, campo por campo.
+    let primerInvalido = null;
+    for (const id of Object.keys(MENSAJES)) {
+      const campo = document.getElementById(id);
+      if (!campo.checkValidity()) {
+        marcarError(campo, MENSAJES[id]);
+        primerInvalido = primerInvalido ?? campo;
+      }
+    }
+    if (primerInvalido) {
+      primerInvalido.focus();
+      return;
+    }
+
+    botonEnviar.disabled = true;
+    botonEnviar.textContent = "Enviando…";
+
+    try {
+      const respuesta = await fetch(`${apiUrl}/api/postulaciones`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nombre: form.elements.nombre.value.trim(),
+          edad: Number(form.elements.edad.value),
+          correo: form.elements.correo.value.trim(),
+          celular: form.elements.celular.value.trim(),
+          area: form.elements.area.value,
+          disponibilidad: form.elements.disponibilidad.value,
+          mensaje: form.elements.mensaje.value.trim() || undefined,
+        }),
+      });
+
+      if (!respuesta.ok) throw new Error(`Error ${respuesta.status}`);
+
+      form.classList.add("hidden");
+      exito.classList.remove("hidden");
+      exito.focus?.();
+      exito.scrollIntoView({ behavior: "smooth", block: "center" });
+    } catch {
+      errorGeneral.textContent =
+        "No pudimos enviar tu postulación. Revisa tu conexión e inténtalo de nuevo; si persiste, escríbenos por Instagram.";
+      errorGeneral.classList.remove("hidden");
+    } finally {
+      botonEnviar.disabled = false;
+      botonEnviar.textContent = "Enviar postulación";
+    }
+  });
 </script>

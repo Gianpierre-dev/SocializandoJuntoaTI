@@ -7,6 +7,7 @@ import keystatic from "@keystatic/astro";
 
 // https://astro.build/config
 export default defineConfig({
+  site: "https://socializando-junto-a-ti-production.up.railway.app",
   // Las páginas del sitio se prerenderizan (estático); el adaptador Node solo
   // sirve las rutas del panel administrativo (/keystatic) marcadas prerender=false.
   adapter: node({ mode: "standalone" }),

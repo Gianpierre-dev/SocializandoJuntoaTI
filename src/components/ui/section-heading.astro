@@ -2,15 +2,18 @@
 interface Props {
   title: string;
   subtitle?: string;
+  /** Nivel del heading: "h1" para el título principal de la página. */
+  nivel?: "h1" | "h2";
 }
 
-const { title, subtitle } = Astro.props;
+const { title, subtitle, nivel = "h2" } = Astro.props;
+const Encabezado = nivel;
 ---
 
 <div class="mx-auto max-w-2xl text-center">
-  <h2 class="text-3xl font-bold text-content sm:text-4xl">
+  <Encabezado class="text-3xl font-bold text-content sm:text-4xl">
     {title}
-  </h2>
+  </Encabezado>
   {
     subtitle && (
       <p class="mt-4 text-base leading-relaxed text-content/70 sm:text-lg">

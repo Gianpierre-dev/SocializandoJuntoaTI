@@ -1,12 +1,10 @@
 ---
 import { Image } from "astro:assets";
-import { getCollection } from "astro:content";
 import logo from "../../assets/logo.png";
+import { obtenerBanners } from "../../lib/api-publica";
 import Button from "../ui/button.astro";
 
-const banners = (await getCollection("banners")).sort(
-  (a, b) => a.data.order - b.data.order,
-);
+const banners = await obtenerBanners();
 
 // Estilos por variante para banners sin imagen.
 const variantClasses = {
@@ -15,8 +13,9 @@ const variantClasses = {
   green: "bg-green text-brand-deep",
 } as const;
 
+// Blanco sobre morado: el dorado no alcanzaba 4.5:1 de contraste.
 const kickerClasses = {
-  brand: "text-gold",
+  brand: "text-white/95",
   gold: "text-brand-deep",
   green: "text-brand-deep",
 } as const;
@@ -40,77 +39,87 @@ const ctaVariants = {
           id="hero-carousel"
           class="flex snap-x snap-mandatory overflow-x-auto scroll-smooth rounded-xl shadow-md [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
-          {banners.map((banner, index) => (
-            <div
-              class="w-full shrink-0 snap-center"
-              role="group"
-              aria-roledescription="banner"
-              aria-label={`${index + 1} de ${banners.length}`}
-            >
-              {banner.data.image ? (
-                <a
-                  href={banner.data.href}
-                  class="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand"
-                >
-                  <Image
-                    src={banner.data.image}
-                    alt={banner.data.alt ?? banner.data.title}
-                    widths={[640, 1024, 1940]}
-                    sizes="(max-width: 1152px) 100vw, 1152px"
-                    class="aspect-[10/3] w-full object-cover"
-                  />
-                </a>
-              ) : (
-                <div
-                  class={`grid h-full items-center gap-6 px-8 py-12 sm:grid-cols-[1fr_auto] sm:px-14 sm:py-16 ${variantClasses[banner.data.variant]}`}
-                >
-                  <div>
-                    <p
-                      class={`text-xs font-bold uppercase tracking-widest ${kickerClasses[banner.data.variant]}`}
-                    >
-                      {banner.data.kicker}
-                    </p>
-                    <p class="mt-3 text-3xl font-bold leading-tight sm:text-4xl">
-                      {banner.data.title}
-                    </p>
-                    {banner.data.description && (
-                      <p class="mt-4 max-w-xl text-sm opacity-90 sm:text-base">
-                        {banner.data.description}
+          {banners.map((banner, index) => {
+            // El primer banner lleva el h1 de la portada.
+            const Titulo = index === 0 ? "h1" : "p";
+            return (
+              <div
+                class="w-full shrink-0 snap-center"
+                role="group"
+                aria-roledescription="banner"
+                aria-label={`${index + 1} de ${banners.length}`}
+              >
+                {banner.imagenUrl ? (
+                  <a
+                    href={banner.enlace}
+                    class="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand"
+                  >
+                    <img
+                      src={banner.imagenUrl}
+                      alt={banner.textoAlternativo ?? banner.titulo}
+                      width="1940"
+                      height="582"
+                      loading={index === 0 ? "eager" : "lazy"}
+                      class="aspect-[10/3] w-full object-cover"
+                    />
+                  </a>
+                ) : (
+                  <div
+                    class={`grid h-full items-center gap-6 px-6 py-10 sm:grid-cols-[1fr_auto] sm:px-14 sm:py-16 ${variantClasses[banner.variante]}`}
+                  >
+                    <div>
+                      <p
+                        class={`text-xs font-bold uppercase tracking-widest ${kickerClasses[banner.variante]}`}
+                      >
+                        {banner.etiqueta}
                       </p>
+                      <Titulo class="mt-3 text-2xl font-bold leading-tight sm:text-4xl">
+                        {banner.titulo}
+                      </Titulo>
+                      {banner.descripcion && (
+                        <p class="mt-4 max-w-xl text-sm opacity-90 sm:text-base">
+                          {banner.descripcion}
+                        </p>
+                      )}
+                    </div>
+                    {banner.textoBoton ? (
+                      <Button
+                        href={banner.enlace}
+                        variant={ctaVariants[banner.variante]}
+                        label={banner.textoBoton}
+                      />
+                    ) : (
+                      <div class="hidden sm:block">
+                        <Image
+                          src={logo}
+                          alt=""
+                          width={176}
+                          height={176}
+                          class="h-44 w-44 object-contain drop-shadow-lg"
+                        />
+                      </div>
                     )}
                   </div>
-                  {banner.data.ctaLabel ? (
-                    <Button
-                      href={banner.data.href}
-                      variant={ctaVariants[banner.data.variant]}
-                      label={banner.data.ctaLabel}
-                    />
-                  ) : (
-                    <div class="hidden sm:block">
-                      <Image
-                        src={logo}
-                        alt=""
-                        width={176}
-                        height={176}
-                        class="h-44 w-44 object-contain drop-shadow-lg"
-                      />
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          ))}
+                )}
+              </div>
+            );
+          })}
         </div>
 
-        {/* Indicadores */}
-        <div class="mt-4 flex justify-center gap-2" role="tablist">
+        {/* Indicadores: punto visual de 12px dentro de un área táctil de 44px */}
+        <div class="mt-2 flex justify-center" role="tablist">
           {banners.map((banner, index) => (
             <button
               type="button"
-              class="hero-dot h-3 w-3 rounded-full bg-content/25 transition-colors hover:bg-brand/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand data-[active]:bg-brand"
+              class="hero-dot group flex h-11 w-11 items-center justify-center focus-visible:outline-none"
               data-active={index === 0 ? "" : undefined}
-              aria-label={`Ir al banner: ${banner.data.title}`}
-            />
+              aria-label={`Ir al banner: ${banner.titulo}`}
+            >
+              <span
+                class="h-3 w-3 rounded-full bg-content/25 transition-colors group-hover:bg-brand/60 group-focus-visible:ring-2 group-focus-visible:ring-brand group-[[data-active]]:bg-brand"
+                aria-hidden="true"
+              />
+            </button>
           ))}
         </div>
       </div>

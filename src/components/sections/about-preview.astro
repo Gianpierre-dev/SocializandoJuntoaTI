@@ -1,13 +1,10 @@
 ---
-import { getCollection } from "astro:content";
+import { obtenerValores } from "../../lib/api-publica";
 import { site } from "../../data/site";
 import SectionHeading from "../ui/section-heading.astro";
 import Button from "../ui/button.astro";
 
-const values = (await getCollection("values")).sort(
-  (a, b) => a.data.order - b.data.order,
-);
-
+const values = await obtenerValores();
 const previewValues = values.slice(0, 4);
 ---
 
@@ -23,7 +20,7 @@ const previewValues = values.slice(0, 4);
         site.mission && (
           <div class="rounded-2xl border border-line bg-subtle p-8">
             <h3 class="text-xl font-semibold text-accent">Misión</h3>
-            <p class="mt-3 text-base leading-relaxed text-content/80">
+            <p class="mt-3 line-clamp-4 text-base leading-relaxed text-content/80">
               {site.mission}
             </p>
           </div>
@@ -33,7 +30,7 @@ const previewValues = values.slice(0, 4);
         site.vision && (
           <div class="rounded-2xl border border-gold/20 bg-gold/5 p-8">
             <h3 class="text-xl font-semibold text-gold">Visión</h3>
-            <p class="mt-3 text-base leading-relaxed text-content/80">
+            <p class="mt-3 line-clamp-4 text-base leading-relaxed text-content/80">
               {site.vision}
             </p>
           </div>
@@ -46,9 +43,9 @@ const previewValues = values.slice(0, 4);
         <ul class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {previewValues.map((value) => (
             <li class="rounded-xl border border-line bg-surface p-5 shadow-sm">
-              <h4 class="font-semibold text-content">{value.data.title}</h4>
+              <h4 class="font-semibold text-content">{value.titulo}</h4>
               <p class="mt-2 text-sm leading-relaxed text-content/70">
-                {value.data.description}
+                {value.descripcion}
               </p>
             </li>
           ))}

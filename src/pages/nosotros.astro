@@ -1,14 +1,14 @@
 ---
-import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/base-layout.astro";
 import { site } from "../data/site";
+import { obtenerValores } from "../lib/api-publica";
 import SectionHeading from "../components/ui/section-heading.astro";
 import TeamGrid from "../components/sections/team-grid.astro";
 import AlliesStrip from "../components/sections/allies-strip.astro";
 
-const values = (await getCollection("values")).sort(
-  (a, b) => a.data.order - b.data.order,
-);
+export const prerender = false;
+
+const values = await obtenerValores();
 
 const pageTitle = `Nosotros | ${site.name}`;
 const pageDescription =
@@ -20,6 +20,7 @@ const pageDescription =
   <section class="bg-surface py-16 sm:py-20">
     <div class="mx-auto max-w-6xl px-4 sm:px-6">
       <SectionHeading
+        nivel="h1"
         title="Nosotros"
         subtitle={`${site.name} es una organización juvenil fundada el ${site.foundedDate}, dedicada a ${site.audience.toLowerCase()}.`}
       />
@@ -66,9 +67,9 @@ const pageDescription =
           <ul class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {values.map((value) => (
               <li class="rounded-xl border border-line bg-subtle p-6 shadow-sm">
-                <h3 class="font-semibold text-content">{value.data.title}</h3>
+                <h3 class="font-semibold text-content">{value.titulo}</h3>
                 <p class="mt-2 text-sm leading-relaxed text-content/70">
-                  {value.data.description}
+                  {value.descripcion}
                 </p>
               </li>
             ))}

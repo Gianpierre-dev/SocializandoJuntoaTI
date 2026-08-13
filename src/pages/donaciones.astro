@@ -1,17 +1,17 @@
 ---
-import { Image } from "astro:assets";
-import { getEntry } from "astro:content";
 import BaseLayout from "../layouts/base-layout.astro";
 import { site } from "../data/site";
+import { obtenerDonaciones } from "../lib/api-publica";
 
-const donaciones = await getEntry("donaciones", "config");
-const datos = donaciones?.data;
+export const prerender = false;
+
+const datos = await obtenerDonaciones();
 
 const pageTitle = `Donaciones | ${site.name}`;
 const pageDescription = `Apoya el trabajo de ${site.name}: cada donación se convierte en talleres, dinámicas y espacios seguros de salud mental para adolescentes y jóvenes.`;
 
-const tieneYape = Boolean(datos?.yapeNumero || datos?.yapeQr);
-const tienePlin = Boolean(datos?.plinNumero || datos?.plinQr);
+const tieneYape = Boolean(datos?.yapeNumero || datos?.yapeQrUrl);
+const tienePlin = Boolean(datos?.plinNumero || datos?.plinQrUrl);
 const tieneCuentas = (datos?.cuentas.length ?? 0) > 0;
 const tienePaypal = Boolean(datos?.paypalUrl);
 const tieneCanales = tieneYape || tienePlin || tieneCuentas || tienePaypal;
@@ -68,12 +68,13 @@ const tieneCanales = tieneYape || tienePlin || tieneCuentas || tienePaypal;
             {tieneYape && (
               <div class="flex flex-col items-center rounded-2xl border border-line bg-surface p-8 text-center shadow-sm">
                 <h3 class="text-xl font-bold text-content">Yape</h3>
-                {datos?.yapeQr && (
-                  <Image
-                    src={datos.yapeQr}
+                {datos?.yapeQrUrl && (
+                  <img
+                    src={datos.yapeQrUrl}
                     alt="Código QR de Yape para donar"
-                    width={220}
-                    height={220}
+                    width="220"
+                    height="220"
+                    loading="lazy"
                     class="mt-5 h-52 w-52 rounded-xl object-contain"
                   />
                 )}
@@ -91,12 +92,13 @@ const tieneCanales = tieneYape || tienePlin || tieneCuentas || tienePaypal;
             {tienePlin && (
               <div class="flex flex-col items-center rounded-2xl border border-line bg-surface p-8 text-center shadow-sm">
                 <h3 class="text-xl font-bold text-content">Plin</h3>
-                {datos?.plinQr && (
-                  <Image
-                    src={datos.plinQr}
+                {datos?.plinQrUrl && (
+                  <img
+                    src={datos.plinQrUrl}
                     alt="Código QR de Plin para donar"
-                    width={220}
-                    height={220}
+                    width="220"
+                    height="220"
+                    loading="lazy"
                     class="mt-5 h-52 w-52 rounded-xl object-contain"
                   />
                 )}
