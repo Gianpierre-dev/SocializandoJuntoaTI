@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { api } from "./api";
-import { AreaTextoAuto, marcarSucio, mostrarToast } from "./ui";
+import {
+  AreaTextoAuto,
+  BotonEliminar,
+  marcarSucio,
+  mostrarToast,
+} from "./ui";
 
 interface AreaTrabajo {
   titulo: string;
@@ -116,14 +121,10 @@ function ListaTextos({
                 )
               }
             />
-            <button
-              type="button"
-              className="shrink-0 text-sm font-medium text-red-600 hover:underline"
-              aria-label={`Eliminar ${etiqueta} ${indice + 1}`}
+            <BotonEliminar
+              ariaLabel={`Eliminar ${etiqueta} ${indice + 1}`}
               onClick={() => onCambio(elementos.filter((_, i) => i !== indice))}
-            >
-              Eliminar
-            </button>
+            />
           </div>
         ))}
       </div>
@@ -399,17 +400,17 @@ export default function FormSitio() {
                     })
                   }
                 />
-                <button
-                  type="button"
-                  className="text-sm font-medium text-red-600 hover:underline"
-                  onClick={() =>
-                    fijar({
-                      areas: datos.areas.filter((_, i) => i !== indice),
-                    })
-                  }
-                >
-                  Eliminar área
-                </button>
+                <div className="pt-1">
+                  <BotonEliminar
+                    etiqueta="Eliminar área"
+                    ariaLabel={`Eliminar área ${area.titulo || indice + 1}`}
+                    onClick={() =>
+                      fijar({
+                        areas: datos.areas.filter((_, i) => i !== indice),
+                      })
+                    }
+                  />
+                </div>
               </div>
             ))}
           </div>

@@ -148,6 +148,47 @@ export function Toasts() {
   );
 }
 
+/* ---------- Botón de eliminar para listas dinámicas ---------- */
+
+interface PropsBotonEliminar {
+  onClick: () => void;
+  /** Texto visible; si se omite, el botón es solo ícono. */
+  etiqueta?: string;
+  ariaLabel: string;
+}
+
+export function BotonEliminar({
+  onClick,
+  etiqueta,
+  ariaLabel,
+}: PropsBotonEliminar) {
+  return (
+    <button
+      type="button"
+      aria-label={ariaLabel}
+      title={ariaLabel}
+      onClick={onClick}
+      className={`inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg border border-red-200 text-red-600 transition-colors hover:border-red-300 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400 ${
+        etiqueta ? "px-3 py-1.5 text-xs font-semibold" : "h-9 w-9"
+      }`}
+    >
+      <svg
+        className="h-4 w-4"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3" />
+      </svg>
+      {etiqueta}
+    </button>
+  );
+}
+
 /* ---------- Modal de confirmación ---------- */
 
 interface PropsConfirmacion {

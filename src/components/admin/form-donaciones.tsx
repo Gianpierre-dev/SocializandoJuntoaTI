@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 import { api } from "./api";
 import SelectorImagen from "./selector-imagen";
-import { AreaTextoAuto, marcarSucio, mostrarToast } from "./ui";
+import {
+  AreaTextoAuto,
+  BotonEliminar,
+  marcarSucio,
+  mostrarToast,
+} from "./ui";
 
 interface Cuenta {
   banco: string;
@@ -333,17 +338,17 @@ export default function FormDonaciones() {
                     />
                   </div>
                 ))}
-                <button
-                  type="button"
-                  className="text-left text-sm font-medium text-red-600 hover:underline"
-                  onClick={() =>
-                    fijar({
-                      cuentas: datos.cuentas.filter((_, i) => i !== indice),
-                    })
-                  }
-                >
-                  Eliminar cuenta
-                </button>
+                <div className="pt-1 sm:col-span-2">
+                  <BotonEliminar
+                    etiqueta="Eliminar cuenta"
+                    ariaLabel={`Eliminar cuenta ${cuenta.banco || indice + 1}`}
+                    onClick={() =>
+                      fijar({
+                        cuentas: datos.cuentas.filter((_, i) => i !== indice),
+                      })
+                    }
+                  />
+                </div>
               </div>
             ))}
           </div>
@@ -401,17 +406,14 @@ export default function FormDonaciones() {
                     })
                   }
                 />
-                <button
-                  type="button"
-                  className="text-sm font-medium text-red-600 hover:underline"
+                <BotonEliminar
+                  ariaLabel={`Eliminar ejemplo ${impacto.monto || indice + 1}`}
                   onClick={() =>
                     fijar({
                       impactos: datos.impactos.filter((_, i) => i !== indice),
                     })
                   }
-                >
-                  Eliminar
-                </button>
+                />
               </div>
             ))}
           </div>
