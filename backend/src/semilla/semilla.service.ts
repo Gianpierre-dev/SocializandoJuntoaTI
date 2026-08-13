@@ -43,6 +43,10 @@ export class SemillaService implements OnApplicationBootstrap {
     await this.sembrarContenido();
   }
 
+  /**
+   * La contraseña del administrador se gobierna desde ADMIN_CONTRASENA:
+   * si cambia la variable, se actualiza el hash en el próximo arranque.
+   */
   private async sembrarAdministrador(): Promise<void> {
     const correo = this.config.get<string>('ADMIN_CORREO');
     const contrasena = this.config.get<string>('ADMIN_CONTRASENA');
@@ -51,17 +55,28 @@ export class SemillaService implements OnApplicationBootstrap {
     const existente = await this.prisma.usuario.findUnique({
       where: { correo },
     });
-    if (existente) return;
 
-    await this.prisma.usuario.create({
-      data: {
-        correo,
-        nombre: 'Administración SOJAT',
-        contrasena: await bcrypt.hash(contrasena, 12),
-        rol: RolUsuario.ADMINISTRADOR,
-      },
-    });
-    this.logger.log(`Usuario administrador creado: ${correo}`);
+    if (!existente) {
+      await this.prisma.usuario.create({
+        data: {
+          correo,
+          nombre: 'Administración SOJAT',
+          contrasena: await bcrypt.hash(contrasena, 12),
+          rol: RolUsuario.ADMINISTRADOR,
+        },
+      });
+      this.logger.log(`Usuario administrador creado: ${correo}`);
+      return;
+    }
+
+    const coincide = await bcrypt.compare(contrasena, existente.contrasena);
+    if (!coincide) {
+      await this.prisma.usuario.update({
+        where: { correo },
+        data: { contrasena: await bcrypt.hash(contrasena, 12) },
+      });
+      this.logger.log(`Contraseña del administrador actualizada: ${correo}`);
+    }
   }
 
   private async sembrarContenido(): Promise<void> {
