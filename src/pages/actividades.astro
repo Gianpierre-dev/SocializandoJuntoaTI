@@ -1,7 +1,9 @@
 ---
 import BaseLayout from "../layouts/base-layout.astro";
 import SectionHeading from "../components/ui/section-heading.astro";
-import { site } from "../data/site";
+import { obtenerSitio } from "../lib/sitio";
+
+const site = await obtenerSitio();
 import { obtenerActividades } from "../lib/api-publica";
 
 export const prerender = false;

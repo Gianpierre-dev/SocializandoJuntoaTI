@@ -13,6 +13,7 @@ import { EquipoModule } from './equipo/equipo.module';
 import { AliadosModule } from './aliados/aliados.module';
 import { ValoresModule } from './valores/valores.module';
 import { PostulacionesModule } from './postulaciones/postulaciones.module';
+import { ConfiguracionModule } from './configuracion/configuracion.module';
 import { SemillaService } from './semilla/semilla.service';
 
 @Module({
@@ -29,6 +30,7 @@ import { SemillaService } from './semilla/semilla.service';
     AliadosModule,
     ValoresModule,
     PostulacionesModule,
+    ConfiguracionModule,
   ],
   controllers: [AppController],
   providers: [AppService, SemillaService],

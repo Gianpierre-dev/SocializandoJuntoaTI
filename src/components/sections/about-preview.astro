@@ -1,6 +1,8 @@
 ---
 import { obtenerValores } from "../../lib/api-publica";
-import { site } from "../../data/site";
+import { obtenerSitio } from "../../lib/sitio";
+
+const site = await obtenerSitio();
 import SectionHeading from "../ui/section-heading.astro";
 import Button from "../ui/button.astro";
 

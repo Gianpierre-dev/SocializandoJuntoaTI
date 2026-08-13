@@ -9,6 +9,7 @@ import {
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import * as datosIniciales from './datos-iniciales.json';
+import * as sitioInicial from './sitio-inicial.json';
 
 const VARIANTES: Record<string, VarianteColor> = {
   brand: VarianteColor.BRAND,
@@ -41,6 +42,66 @@ export class SemillaService implements OnApplicationBootstrap {
   async onApplicationBootstrap(): Promise<void> {
     await this.sembrarAdministrador();
     await this.sembrarContenido();
+    await this.sembrarConfiguracionSitio();
+  }
+
+  private async sembrarConfiguracionSitio(): Promise<void> {
+    const existente = await this.prisma.configuracionSitio.findUnique({
+      where: { id: 1 },
+    });
+    if (existente) return;
+
+    const ordenado = (textos: string[]) =>
+      textos.map((texto, indice) => ({ texto, orden: indice + 1 }));
+
+    await this.prisma.configuracionSitio.create({
+      data: {
+        id: 1,
+        nombre: sitioInicial.name,
+        eslogan: sitioInicial.slogan,
+        fechaFundacion: sitioInicial.foundedDate,
+        publicoObjetivo: sitioInicial.audience,
+        mision: sitioInicial.mission,
+        vision: sitioInicial.vision,
+        objetivo: sitioInicial.objective,
+        instagramUrl: sitioInicial.socials.instagram || null,
+        tiktokUrl:
+          sitioInicial.socials.tiktok !== '#'
+            ? sitioInicial.socials.tiktok
+            : null,
+        facebookUrl:
+          sitioInicial.socials.facebook !== '#'
+            ? sitioInicial.socials.facebook
+            : null,
+        linktreeUrl: sitioInicial.socials.linktree || null,
+        whatsappUrl:
+          sitioInicial.socials.whatsapp !== '#'
+            ? sitioInicial.socials.whatsapp
+            : null,
+        sedes: {
+          create: sitioInicial.locations.map((nombre, indice) => ({
+            nombre,
+            orden: indice + 1,
+          })),
+        },
+        plataformas: {
+          create: sitioInicial.online.map((nombre, indice) => ({
+            nombre,
+            orden: indice + 1,
+          })),
+        },
+        requisitos: { create: ordenado(sitioInicial.requirements) },
+        beneficios: { create: ordenado(sitioInicial.benefits) },
+        areas: {
+          create: sitioInicial.areas.map((area, indice) => ({
+            titulo: area.title,
+            descripcion: area.description,
+            orden: indice + 1,
+          })),
+        },
+      },
+    });
+    this.logger.log('Configuración del sitio sembrada');
   }
 
   /**

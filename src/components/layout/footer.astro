@@ -1,7 +1,9 @@
 ---
 import { Image } from "astro:assets";
 import logo from "../../assets/logo.png";
-import { site } from "../../data/site";
+import { obtenerSitio } from "../../lib/sitio";
+
+const site = await obtenerSitio();
 
 const navLinks = [
   { label: "Inicio", href: "/" },

@@ -1,6 +1,8 @@
 ---
 import "../styles/global.css";
-import { site } from "../data/site";
+import { obtenerSitio } from "../lib/sitio";
+
+const site = await obtenerSitio();
 import Header from "../components/layout/header.astro";
 import Footer from "../components/layout/footer.astro";
 

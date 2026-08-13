@@ -1,7 +1,9 @@
 ---
 // Formulario de postulación: 7 campos esenciales, validación accesible y
 // envío a la API del backend. Lo demás se conversa en la entrevista.
-import { site } from "../../data/site";
+import { obtenerSitio } from "../../lib/sitio";
+
+const site = await obtenerSitio();
 import { API_PUBLICA_URL } from "../../lib/api-publica";
 import SectionHeading from "../ui/section-heading.astro";
 

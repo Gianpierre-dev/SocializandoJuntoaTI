@@ -4,6 +4,7 @@ import { RECURSOS } from "./recursos";
 import CrudRecurso from "./crud-recurso";
 import FormDonaciones from "./form-donaciones";
 import ListaPostulaciones from "./lista-postulaciones";
+import FormSitio from "./form-sitio";
 
 function IconoOjo({ tachado }: { tachado: boolean }) {
   return (
@@ -190,6 +191,7 @@ const SECCIONES = [
     etiqueta: recurso.etiqueta,
   })),
   { clave: "donaciones", etiqueta: "Donaciones" },
+  { clave: "sitio", etiqueta: "Datos generales" },
 ];
 
 export default function PanelAdmin() {
@@ -257,6 +259,8 @@ export default function PanelAdmin() {
           <CrudRecurso key={recursoActivo.clave} recurso={recursoActivo} />
         ) : seccion === "postulaciones" ? (
           <ListaPostulaciones />
+        ) : seccion === "sitio" ? (
+          <FormSitio />
         ) : (
           <FormDonaciones />
         )}

@@ -2,7 +2,9 @@
 import BaseLayout from "../layouts/base-layout.astro";
 import SectionHeading from "../components/ui/section-heading.astro";
 import Button from "../components/ui/button.astro";
-import { site } from "../data/site";
+import { obtenerSitio } from "../lib/sitio";
+
+const site = await obtenerSitio();
 
 // Real social channels. We replace the single Linktree link by listing each
 // channel directly, and keep only those with a configured URL.

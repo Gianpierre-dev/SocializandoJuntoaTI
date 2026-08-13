@@ -2,7 +2,9 @@
 import BaseLayout from "../../layouts/base-layout.astro";
 import BlogPreview from "../../components/sections/blog-preview.astro";
 import Button from "../../components/ui/button.astro";
-import { site } from "../../data/site";
+import { obtenerSitio } from "../../lib/sitio";
+
+const site = await obtenerSitio();
 
 const title = `Blog | ${site.name}`;
 const description =

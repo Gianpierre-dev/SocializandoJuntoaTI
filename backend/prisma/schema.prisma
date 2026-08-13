@@ -130,6 +130,82 @@ model Valor {
   @@map("valores")
 }
 
+model ConfiguracionSitio {
+  id              Int      @id @default(1)
+  nombre          String
+  eslogan         String
+  fechaFundacion  String
+  publicoObjetivo String
+  mision          String
+  vision          String
+  objetivo        String
+  instagramUrl    String?
+  tiktokUrl       String?
+  facebookUrl     String?
+  linktreeUrl     String?
+  whatsappUrl     String?
+  actualizadoEn   DateTime @updatedAt
+
+  sedes       Sede[]
+  plataformas PlataformaOnline[]
+  requisitos  RequisitoVoluntariado[]
+  beneficios  BeneficioVoluntariado[]
+  areas       AreaTrabajo[]
+
+  @@map("configuracion_sitio")
+}
+
+model Sede {
+  id              String             @id @default(uuid())
+  nombre          String
+  orden           Int
+  configuracion   ConfiguracionSitio @relation(fields: [configuracionId], references: [id], onDelete: Cascade)
+  configuracionId Int
+
+  @@map("sedes")
+}
+
+model PlataformaOnline {
+  id              String             @id @default(uuid())
+  nombre          String
+  orden           Int
+  configuracion   ConfiguracionSitio @relation(fields: [configuracionId], references: [id], onDelete: Cascade)
+  configuracionId Int
+
+  @@map("plataformas_online")
+}
+
+model RequisitoVoluntariado {
+  id              String             @id @default(uuid())
+  texto           String
+  orden           Int
+  configuracion   ConfiguracionSitio @relation(fields: [configuracionId], references: [id], onDelete: Cascade)
+  configuracionId Int
+
+  @@map("requisitos_voluntariado")
+}
+
+model BeneficioVoluntariado {
+  id              String             @id @default(uuid())
+  texto           String
+  orden           Int
+  configuracion   ConfiguracionSitio @relation(fields: [configuracionId], references: [id], onDelete: Cascade)
+  configuracionId Int
+
+  @@map("beneficios_voluntariado")
+}
+
+model AreaTrabajo {
+  id              String             @id @default(uuid())
+  titulo          String
+  descripcion     String
+  orden           Int
+  configuracion   ConfiguracionSitio @relation(fields: [configuracionId], references: [id], onDelete: Cascade)
+  configuracionId Int
+
+  @@map("areas_trabajo")
+}
+
 model Postulacion {
   id             String   @id @default(uuid())
   nombre         String

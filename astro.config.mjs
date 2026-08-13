@@ -3,15 +3,14 @@ import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@astrojs/react";
 import node from "@astrojs/node";
-import keystatic from "@keystatic/astro";
 
 // https://astro.build/config
 export default defineConfig({
   site: "https://socializando-junto-a-ti-production.up.railway.app",
-  // Las páginas del sitio se prerenderizan (estático); el adaptador Node solo
-  // sirve las rutas del panel administrativo (/keystatic) marcadas prerender=false.
+  // SSR con adaptador Node: las páginas leen su contenido de la API del
+  // backend en cada request (editable desde /admin sin redesplegar).
   adapter: node({ mode: "standalone" }),
-  integrations: [react(), keystatic()],
+  integrations: [react()],
   // host: true binds 0.0.0.0; port reads Railway's injected PORT at runtime.
   server: {
     host: true,

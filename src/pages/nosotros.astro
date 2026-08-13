@@ -1,6 +1,8 @@
 ---
 import BaseLayout from "../layouts/base-layout.astro";
-import { site } from "../data/site";
+import { obtenerSitio } from "../lib/sitio";
+
+const site = await obtenerSitio();
 import { obtenerValores } from "../lib/api-publica";
 import SectionHeading from "../components/ui/section-heading.astro";
 import TeamGrid from "../components/sections/team-grid.astro";

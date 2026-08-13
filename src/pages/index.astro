@@ -1,6 +1,8 @@
 ---
 import BaseLayout from "../layouts/base-layout.astro";
-import { site } from "../data/site";
+import { obtenerSitio } from "../lib/sitio";
+
+const site = await obtenerSitio();
 
 export const prerender = false;
 import Hero from "../components/sections/hero.astro";

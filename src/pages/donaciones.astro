@@ -1,6 +1,8 @@
 ---
 import BaseLayout from "../layouts/base-layout.astro";
-import { site } from "../data/site";
+import { obtenerSitio } from "../lib/sitio";
+
+const site = await obtenerSitio();
 import { obtenerDonaciones } from "../lib/api-publica";
 
 export const prerender = false;

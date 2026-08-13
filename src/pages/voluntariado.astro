@@ -2,7 +2,9 @@
 import BaseLayout from "../layouts/base-layout.astro";
 import SectionHeading from "../components/ui/section-heading.astro";
 import VolunteerForm from "../components/forms/volunteer-form.astro";
-import { site } from "../data/site";
+import { obtenerSitio } from "../lib/sitio";
+
+const site = await obtenerSitio();
 
 const pageTitle = `Voluntariado | ${site.name}`;
 const pageDescription =

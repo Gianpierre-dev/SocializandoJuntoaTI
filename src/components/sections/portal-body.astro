@@ -2,7 +2,9 @@
 // Cuerpo tipo portal institucional: destacado + notas de prensa a la izquierda,
 // mosaico de accesos a programas a la derecha (administrado desde el panel).
 import { obtenerProgramas } from "../../lib/api-publica";
-import { site } from "../../data/site";
+import { obtenerSitio } from "../../lib/sitio";
+
+const site = await obtenerSitio();
 
 const programas = await obtenerProgramas();
 

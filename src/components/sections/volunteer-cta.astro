@@ -1,5 +1,7 @@
 ---
-import { site } from "../../data/site";
+import { obtenerSitio } from "../../lib/sitio";
+
+const site = await obtenerSitio();
 import Button from "../ui/button.astro";
 
 const previewRequirements = site.requirements.slice(0, 4);
