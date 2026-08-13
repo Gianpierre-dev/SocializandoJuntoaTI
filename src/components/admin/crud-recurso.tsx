@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api, subirImagen } from "./api";
+import { api } from "./api";
+import SelectorImagen from "./selector-imagen";
 import type { CampoRecurso, RecursoConfig } from "./recursos";
 
 type Registro = Record<string, unknown> & { id: string };
@@ -100,52 +101,14 @@ function CampoImagen({
   valor: string;
   onCambio: (url: string) => void;
 }) {
-  const [subiendo, setSubiendo] = useState(false);
-  const [error, setError] = useState("");
-
-  const manejarArchivo = async (archivo: File | undefined) => {
-    if (!archivo || !campo.carpeta) return;
-    setError("");
-    setSubiendo(true);
-    try {
-      onCambio(await subirImagen(campo.carpeta, archivo));
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Error al subir");
-    } finally {
-      setSubiendo(false);
-    }
-  };
-
+  if (!campo.carpeta) return null;
   return (
-    <div>
-      {valor ? (
-        <div className="mb-2 flex items-center gap-3">
-          <img
-            src={valor}
-            alt=""
-            className="h-16 w-24 rounded-lg border border-line object-cover"
-          />
-          <button
-            type="button"
-            className="text-sm font-medium text-red-600 hover:underline"
-            onClick={() => onCambio("")}
-          >
-            Quitar imagen
-          </button>
-        </div>
-      ) : null}
-      <input
-        type="file"
-        accept="image/png,image/jpeg,image/webp"
-        className="block text-sm text-content/70"
-        onChange={(e) => void manejarArchivo(e.target.files?.[0])}
-        disabled={subiendo}
-      />
-      {subiendo && (
-        <p className="mt-1 text-xs text-content/60">Subiendo imagen…</p>
-      )}
-      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
-    </div>
+    <SelectorImagen
+      carpeta={campo.carpeta}
+      valor={valor}
+      onCambio={onCambio}
+      sugerencia={campo.etiqueta.match(/\d+×\d+/)?.[0]}
+    />
   );
 }
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { api, subirImagen } from "./api";
+import { api } from "./api";
+import SelectorImagen from "./selector-imagen";
 
 interface Cuenta {
   banco: string;
@@ -36,52 +37,55 @@ function CampoQr({
   valor: string;
   onCambio: (url: string) => void;
 }) {
-  const [subiendo, setSubiendo] = useState(false);
-  const [error, setError] = useState("");
-
   return (
     <div>
       <label className="mb-1 block text-sm font-medium text-content">
         {etiqueta}
       </label>
-      {valor && (
-        <div className="mb-2 flex items-center gap-3">
-          <img
-            src={valor}
-            alt=""
-            className="h-24 w-24 rounded-lg border border-line object-contain"
-          />
-          <button
-            type="button"
-            className="text-sm font-medium text-red-600 hover:underline"
-            onClick={() => onCambio("")}
-          >
-            Quitar
-          </button>
-        </div>
-      )}
-      <input
-        type="file"
-        accept="image/png,image/jpeg,image/webp"
-        className="block text-sm text-content/70"
-        disabled={subiendo}
-        onChange={(e) => {
-          const archivo = e.target.files?.[0];
-          if (!archivo) return;
-          setError("");
-          setSubiendo(true);
-          subirImagen("donaciones", archivo)
-            .then(onCambio)
-            .catch((err: unknown) =>
-              setError(err instanceof Error ? err.message : "Error al subir"),
-            )
-            .finally(() => setSubiendo(false));
-        }}
+      <SelectorImagen
+        carpeta="donaciones"
+        valor={valor}
+        onCambio={onCambio}
+        forma="cuadrada"
+        sugerencia="imagen cuadrada del QR"
       />
-      {subiendo && (
-        <p className="mt-1 text-xs text-content/60">Subiendo imagen…</p>
+    </div>
+  );
+}
+
+/** Celular peruano: 9 dígitos empezando con 9. */
+const esCelularValido = (numero: string) => /^9\d{8}$/.test(numero.trim());
+
+function CampoCelular({
+  etiqueta,
+  valor,
+  onCambio,
+}: {
+  etiqueta: string;
+  valor: string;
+  onCambio: (numero: string) => void;
+}) {
+  const mostrarError = valor.length > 0 && !esCelularValido(valor);
+  return (
+    <div>
+      <label className="mb-1 block text-sm font-medium text-content">
+        {etiqueta}
+      </label>
+      <input
+        className={claseInput}
+        type="tel"
+        inputMode="numeric"
+        maxLength={9}
+        placeholder="9XXXXXXXX"
+        aria-invalid={mostrarError || undefined}
+        value={valor}
+        onChange={(e) => onCambio(e.target.value.replace(/\D/g, "").slice(0, 9))}
+      />
+      {mostrarError && (
+        <p role="alert" className="mt-1 text-sm text-red-600">
+          Debe tener 9 dígitos y empezar con 9.
+        </p>
       )}
-      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
     </div>
   );
 }
@@ -130,7 +134,6 @@ export default function FormDonaciones() {
     if (!datos.intro.trim()) {
       errores.push("El texto de introducción es obligatorio.");
     }
-    const esCelularValido = (numero: string) => /^9\d{8}$/.test(numero.trim());
     if (datos.yapeNumero && !esCelularValido(datos.yapeNumero)) {
       errores.push("El número de Yape debe tener 9 dígitos y empezar con 9.");
     }
@@ -195,11 +198,10 @@ export default function FormDonaciones() {
         <div className="grid gap-6 sm:grid-cols-2">
           <div className="space-y-4 rounded-xl border border-line bg-white p-4">
             <p className="font-semibold text-content">Yape</p>
-            <input
-              className={claseInput}
-              placeholder="Número de Yape"
-              value={datos.yapeNumero ?? ""}
-              onChange={(e) => fijar({ yapeNumero: e.target.value })}
+            <CampoCelular
+              etiqueta="Número de Yape"
+              valor={datos.yapeNumero ?? ""}
+              onCambio={(numero) => fijar({ yapeNumero: numero })}
             />
             <CampoQr
               etiqueta="QR de Yape"
@@ -209,11 +211,10 @@ export default function FormDonaciones() {
           </div>
           <div className="space-y-4 rounded-xl border border-line bg-white p-4">
             <p className="font-semibold text-content">Plin</p>
-            <input
-              className={claseInput}
-              placeholder="Número de Plin"
-              value={datos.plinNumero ?? ""}
-              onChange={(e) => fijar({ plinNumero: e.target.value })}
+            <CampoCelular
+              etiqueta="Número de Plin"
+              valor={datos.plinNumero ?? ""}
+              onCambio={(numero) => fijar({ plinNumero: numero })}
             />
             <CampoQr
               etiqueta="QR de Plin"
@@ -230,9 +231,19 @@ export default function FormDonaciones() {
           <input
             className={claseInput}
             placeholder="https://paypal.me/…"
+            aria-invalid={
+              datos.paypalUrl && !/^https:\/\//.test(datos.paypalUrl)
+                ? true
+                : undefined
+            }
             value={datos.paypalUrl ?? ""}
             onChange={(e) => fijar({ paypalUrl: e.target.value })}
           />
+          {datos.paypalUrl && !/^https:\/\//.test(datos.paypalUrl) && (
+            <p role="alert" className="mt-1 text-sm text-red-600">
+              El enlace debe empezar con https://
+            </p>
+          )}
         </div>
 
         <div>
