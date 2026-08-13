@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "./api";
+import { mostrarToast } from "./ui";
 
 interface AreaTrabajo {
   titulo: string;
@@ -210,6 +211,7 @@ export default function FormSitio() {
         }),
       });
       setMensaje("Cambios guardados. El sitio ya los muestra.");
+      mostrarToast("Datos generales actualizados");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error al guardar");
     } finally {

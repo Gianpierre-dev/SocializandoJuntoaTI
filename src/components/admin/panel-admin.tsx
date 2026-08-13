@@ -5,6 +5,7 @@ import CrudRecurso from "./crud-recurso";
 import FormDonaciones from "./form-donaciones";
 import ListaPostulaciones from "./lista-postulaciones";
 import FormSitio from "./form-sitio";
+import { Toasts } from "./ui";
 
 function IconoOjo({ tachado }: { tachado: boolean }) {
   return (
@@ -347,6 +348,8 @@ export default function PanelAdmin() {
           <FormDonaciones />
         )}
       </main>
+
+      <Toasts />
     </div>
   );
 }

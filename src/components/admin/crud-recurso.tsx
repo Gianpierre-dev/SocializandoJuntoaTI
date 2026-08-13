@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "./api";
 import SelectorImagen from "./selector-imagen";
+import { ModalConfirmacion, SkeletonTabla, mostrarToast } from "./ui";
 import type { CampoRecurso, RecursoConfig } from "./recursos";
 
 type Registro = Record<string, unknown> & { id: string };
@@ -215,6 +216,7 @@ function Formulario({
           body: JSON.stringify(cuerpo),
         });
       }
+      mostrarToast(registro ? "Cambios guardados" : "Registro creado");
       onGuardado();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error al guardar");
@@ -379,6 +381,7 @@ export default function CrudRecurso({ recurso }: { recurso: RecursoConfig }) {
   const [error, setError] = useState("");
   const [editando, setEditando] = useState<Registro | null>(null);
   const [creando, setCreando] = useState(false);
+  const [eliminando, setEliminando] = useState<Registro | null>(null);
 
   const columnas = recurso.campos.filter((campo) => campo.enTabla);
   const campoImagen = recurso.campos.find((campo) => campo.tipo === "imagen");
@@ -402,16 +405,36 @@ export default function CrudRecurso({ recurso }: { recurso: RecursoConfig }) {
   }, [cargar]);
 
   const eliminar = async (registro: Registro) => {
-    const etiqueta = String(
-      registro[columnas[0]?.nombre ?? "id"] ?? registro.id,
-    );
-    if (!window.confirm(`¿Eliminar "${etiqueta}"? Esta acción no se deshace.`))
-      return;
     try {
       await api(`${recurso.endpoint}/${registro.id}`, { method: "DELETE" });
+      mostrarToast("Registro eliminado");
       await cargar();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error al eliminar");
+    }
+  };
+
+  const tieneOrden = recurso.campos.some((campo) => campo.nombre === "orden");
+
+  /** Intercambia el orden con el registro vecino (flechas de la tabla). */
+  const mover = async (indice: number, direccion: -1 | 1) => {
+    const actual = registros[indice];
+    const vecino = registros[indice + direccion];
+    if (!actual || !vecino) return;
+    try {
+      await Promise.all([
+        api(`${recurso.endpoint}/${actual.id}`, {
+          method: "PATCH",
+          body: JSON.stringify({ orden: Number(vecino.orden) }),
+        }),
+        api(`${recurso.endpoint}/${vecino.id}`, {
+          method: "PATCH",
+          body: JSON.stringify({ orden: Number(actual.orden) }),
+        }),
+      ]);
+      await cargar();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Error al reordenar");
     }
   };
 
@@ -441,7 +464,7 @@ export default function CrudRecurso({ recurso }: { recurso: RecursoConfig }) {
       {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
 
       {cargando ? (
-        <p className="mt-6 text-sm text-content/60">Cargando…</p>
+        <SkeletonTabla />
       ) : (
         <div className="mt-6 overflow-x-auto rounded-2xl border border-line bg-white shadow-sm">
           <table className="w-full text-left text-sm">
@@ -462,7 +485,7 @@ export default function CrudRecurso({ recurso }: { recurso: RecursoConfig }) {
               </tr>
             </thead>
             <tbody>
-              {registros.map((registro) => {
+              {registros.map((registro, indiceFila) => {
                 const urlImagen = campoImagen
                   ? String(registro[campoImagen.nombre] ?? "")
                   : "";
@@ -515,7 +538,29 @@ export default function CrudRecurso({ recurso }: { recurso: RecursoConfig }) {
                       </td>
                     ))}
                     <td className="px-4 py-2.5 text-right">
-                      <div className="inline-flex gap-2">
+                      <div className="inline-flex items-center gap-2">
+                        {tieneOrden && (
+                          <span className="mr-1 inline-flex flex-col">
+                            <button
+                              type="button"
+                              aria-label="Subir en el orden"
+                              disabled={indiceFila === 0}
+                              className="rounded px-1.5 text-content/40 hover:bg-subtle hover:text-accent disabled:opacity-25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                              onClick={() => void mover(indiceFila, -1)}
+                            >
+                              ▲
+                            </button>
+                            <button
+                              type="button"
+                              aria-label="Bajar en el orden"
+                              disabled={indiceFila === registros.length - 1}
+                              className="rounded px-1.5 text-content/40 hover:bg-subtle hover:text-accent disabled:opacity-25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                              onClick={() => void mover(indiceFila, 1)}
+                            >
+                              ▼
+                            </button>
+                          </span>
+                        )}
                         <button
                           type="button"
                           className="rounded-lg bg-subtle px-3 py-1.5 text-xs font-semibold text-accent transition-colors hover:bg-brand hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
@@ -526,7 +571,7 @@ export default function CrudRecurso({ recurso }: { recurso: RecursoConfig }) {
                         <button
                           type="button"
                           className="rounded-lg px-3 py-1.5 text-xs font-semibold text-red-600 transition-colors hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
-                          onClick={() => void eliminar(registro)}
+                          onClick={() => setEliminando(registro)}
                         >
                           Eliminar
                         </button>
@@ -571,6 +616,21 @@ export default function CrudRecurso({ recurso }: { recurso: RecursoConfig }) {
             setCreando(false);
             setEditando(null);
           }}
+        />
+      )}
+
+      {eliminando && (
+        <ModalConfirmacion
+          titulo="Eliminar registro"
+          mensaje={`Se eliminará "${String(
+            eliminando[campoTitulo] ?? eliminando.id,
+          )}" de forma permanente. Esta acción no se puede deshacer.`}
+          onConfirmar={() => {
+            const registro = eliminando;
+            setEliminando(null);
+            void eliminar(registro);
+          }}
+          onCancelar={() => setEliminando(null)}
         />
       )}
     </div>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "./api";
 import SelectorImagen from "./selector-imagen";
+import { mostrarToast } from "./ui";
 
 interface Cuenta {
   banco: string;
@@ -171,6 +172,7 @@ export default function FormDonaciones() {
         }),
       });
       setMensaje("Cambios guardados correctamente.");
+      mostrarToast("Donaciones actualizadas");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error al guardar");
     } finally {

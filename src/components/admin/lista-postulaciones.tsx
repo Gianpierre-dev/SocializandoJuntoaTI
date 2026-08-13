@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { api } from "./api";
+import { ModalConfirmacion, SkeletonTabla, mostrarToast } from "./ui";
 
 interface Postulacion {
   id: string;
@@ -34,35 +35,72 @@ export default function ListaPostulaciones() {
     void cargar();
   }, [cargar]);
 
+  const [eliminando, setEliminando] = useState<Postulacion | null>(null);
+
   const eliminar = async (postulacion: Postulacion) => {
-    if (
-      !window.confirm(
-        `¿Eliminar la postulación de "${postulacion.nombre}"? Esta acción no se deshace.`,
-      )
-    )
-      return;
     try {
       await api(`/postulaciones/${postulacion.id}`, { method: "DELETE" });
+      mostrarToast("Postulación eliminada");
       await cargar();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error al eliminar");
     }
   };
 
+  /** Descarga las postulaciones como CSV para RRHH. */
+  const exportarCsv = () => {
+    const escapar = (valor: string) => `"${valor.replaceAll('"', '""')}"`;
+    const filas = [
+      ["Nombre", "Edad", "Correo", "Celular", "Área", "Disponibilidad", "Mensaje", "Fecha"],
+      ...postulaciones.map((p) => [
+        p.nombre,
+        String(p.edad),
+        p.correo,
+        p.celular,
+        p.area,
+        p.disponibilidad,
+        p.mensaje ?? "",
+        new Date(p.creadoEn).toLocaleString("es-PE"),
+      ]),
+    ];
+    const csv = filas.map((fila) => fila.map(escapar).join(",")).join("\r\n");
+    const blob = new Blob(["﻿" + csv], {
+      type: "text/csv;charset=utf-8",
+    });
+    const enlace = document.createElement("a");
+    enlace.href = URL.createObjectURL(blob);
+    enlace.download = "postulaciones-sojat.csv";
+    enlace.click();
+    URL.revokeObjectURL(enlace.href);
+  };
+
   return (
     <div>
-      <h1 className="text-2xl font-bold text-content">
-        Postulaciones de voluntariado
-      </h1>
-      <p className="mt-1 text-sm text-content/60">
-        Llegan desde el formulario del sitio. Contacta a cada persona por
-        WhatsApp o correo.
-      </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-content">
+            Postulaciones de voluntariado
+          </h1>
+          <p className="mt-1 text-sm text-content/60">
+            Llegan desde el formulario del sitio. Contacta a cada persona por
+            WhatsApp o correo.
+          </p>
+        </div>
+        {postulaciones.length > 0 && (
+          <button
+            type="button"
+            className="rounded-lg border border-line px-4 py-2 text-sm font-medium text-content transition-colors hover:bg-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+            onClick={exportarCsv}
+          >
+            ⬇ Exportar CSV
+          </button>
+        )}
+      </div>
 
       {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
 
       {cargando ? (
-        <p className="mt-6 text-sm text-content/60">Cargando…</p>
+        <SkeletonTabla filas={3} />
       ) : postulaciones.length === 0 ? (
         <p className="mt-8 rounded-xl border border-line bg-white p-8 text-center text-content/50">
           Todavía no hay postulaciones.
@@ -110,7 +148,7 @@ export default function ListaPostulaciones() {
                 <button
                   type="button"
                   className="text-sm font-medium text-red-600 hover:underline"
-                  onClick={() => void eliminar(p)}
+                  onClick={() => setEliminando(p)}
                 >
                   Eliminar
                 </button>
@@ -118,6 +156,19 @@ export default function ListaPostulaciones() {
             </article>
           ))}
         </div>
+      )}
+
+      {eliminando && (
+        <ModalConfirmacion
+          titulo="Eliminar postulación"
+          mensaje={`Se eliminará la postulación de "${eliminando.nombre}" de forma permanente.`}
+          onConfirmar={() => {
+            const postulacion = eliminando;
+            setEliminando(null);
+            void eliminar(postulacion);
+          }}
+          onCancelar={() => setEliminando(null)}
+        />
       )}
     </div>
   );
