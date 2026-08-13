@@ -1,0 +1,21 @@
+---
+// Panel administrativo del sistema (SPA React contra la API del backend).
+import "../styles/global.css";
+import PanelAdmin from "../components/admin/panel-admin";
+
+export const prerender = false;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=3" />
+    <title>Panel administrativo | Socializando Junto A Ti</title>
+  </head>
+  <body>
+    <PanelAdmin client:only="react" />
+  </body>
+</html>

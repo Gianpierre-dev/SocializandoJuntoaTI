@@ -115,6 +115,41 @@ export class SemillaService implements OnApplicationBootstrap {
       );
     }
 
+    if ((await this.prisma.miembroEquipo.count()) === 0) {
+      await this.prisma.miembroEquipo.createMany({
+        data: datosIniciales.equipo.map((miembro) => ({
+          nombre: miembro.name,
+          usuarioRedes: miembro.handle,
+          rol: miembro.role,
+          orden: miembro.order,
+        })),
+      });
+      this.logger.log(`Equipo sembrado: ${datosIniciales.equipo.length}`);
+    }
+
+    if ((await this.prisma.aliado.count()) === 0) {
+      await this.prisma.aliado.createMany({
+        data: datosIniciales.aliados.map((aliado) => ({
+          nombre: aliado.name,
+          usuarioRedes: aliado.handle,
+          enlace: aliado.url ?? null,
+          orden: aliado.order,
+        })),
+      });
+      this.logger.log(`Aliados sembrados: ${datosIniciales.aliados.length}`);
+    }
+
+    if ((await this.prisma.valor.count()) === 0) {
+      await this.prisma.valor.createMany({
+        data: datosIniciales.valores.map((valor) => ({
+          titulo: valor.title,
+          descripcion: valor.description,
+          orden: valor.order,
+        })),
+      });
+      this.logger.log(`Valores sembrados: ${datosIniciales.valores.length}`);
+    }
+
     const configuracion = await this.prisma.configuracionDonaciones.findUnique({
       where: { id: 1 },
     });

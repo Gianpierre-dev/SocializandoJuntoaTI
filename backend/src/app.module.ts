@@ -8,6 +8,10 @@ import { AlmacenamientoModule } from './almacenamiento/almacenamiento.module';
 import { BannersModule } from './banners/banners.module';
 import { ProgramasModule } from './programas/programas.module';
 import { DonacionesModule } from './donaciones/donaciones.module';
+import { ActividadesModule } from './actividades/actividades.module';
+import { EquipoModule } from './equipo/equipo.module';
+import { AliadosModule } from './aliados/aliados.module';
+import { ValoresModule } from './valores/valores.module';
 import { SemillaService } from './semilla/semilla.service';
 
 @Module({
@@ -19,6 +23,10 @@ import { SemillaService } from './semilla/semilla.service';
     BannersModule,
     ProgramasModule,
     DonacionesModule,
+    ActividadesModule,
+    EquipoModule,
+    AliadosModule,
+    ValoresModule,
   ],
   controllers: [AppController],
   providers: [AppService, SemillaService],
