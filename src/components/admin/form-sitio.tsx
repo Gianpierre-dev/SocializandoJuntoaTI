@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "./api";
-import { mostrarToast } from "./ui";
+import { AreaTextoAuto, mostrarToast } from "./ui";
 
 interface AreaTrabajo {
   titulo: string;
@@ -65,7 +65,7 @@ function Campo({
     <label className="block text-sm font-medium text-content">
       {etiqueta}
       {multilinea ? (
-        <textarea
+        <AreaTextoAuto
           className={claseInput}
           rows={3}
           value={valor}
@@ -357,7 +357,7 @@ export default function FormSitio() {
                     })
                   }
                 />
-                <textarea
+                <AreaTextoAuto
                   className={`${claseInput} mt-0`}
                   rows={2}
                   placeholder="Descripción del área"

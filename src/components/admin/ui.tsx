@@ -1,4 +1,31 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+/* ---------- Textarea que crece con el contenido (sin scroll interno) ---------- */
+
+interface PropsAreaTexto
+  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+  value: string;
+}
+
+export function AreaTextoAuto({ value, ...props }: PropsAreaTexto) {
+  const ref = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const elemento = ref.current;
+    if (!elemento) return;
+    elemento.style.height = "auto";
+    elemento.style.height = `${elemento.scrollHeight + 2}px`;
+  }, [value]);
+
+  return (
+    <textarea
+      ref={ref}
+      value={value}
+      {...props}
+      className={`${props.className ?? ""} resize-none overflow-hidden`}
+    />
+  );
+}
 
 /* ---------- Toasts ---------- */
 

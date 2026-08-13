@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "./api";
 import SelectorImagen from "./selector-imagen";
-import { mostrarToast } from "./ui";
+import { AreaTextoAuto, mostrarToast } from "./ui";
 
 interface Cuenta {
   banco: string;
@@ -189,7 +189,7 @@ export default function FormDonaciones() {
           <label className="mb-1 block text-sm font-medium text-content">
             Texto de introducción
           </label>
-          <textarea
+          <AreaTextoAuto
             className={claseInput}
             rows={3}
             value={datos.intro}

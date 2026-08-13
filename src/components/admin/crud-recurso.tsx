@@ -1,7 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "./api";
 import SelectorImagen from "./selector-imagen";
-import { ModalConfirmacion, SkeletonTabla, mostrarToast } from "./ui";
+import {
+  AreaTextoAuto,
+  ModalConfirmacion,
+  SkeletonTabla,
+  mostrarToast,
+} from "./ui";
 import type { CampoRecurso, RecursoConfig } from "./recursos";
 
 type Registro = Record<string, unknown> & { id: string };
@@ -285,7 +290,7 @@ function Formulario({
                 />
               )}
               {campo.tipo === "textarea" && (
-                <textarea
+                <AreaTextoAuto
                   id={`campo-${campo.nombre}`}
                   className={claseInput}
                   rows={3}
