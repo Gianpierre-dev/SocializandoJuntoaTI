@@ -96,6 +96,9 @@ function Formulario({
   });
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState("");
+  const [erroresCampos, setErroresCampos] = useState<Record<string, string>>(
+    {},
+  );
   const cuerpoRef = useRef<HTMLDivElement>(null);
 
   // Foco al primer campo al abrir; Escape cierra.
@@ -113,8 +116,43 @@ function Formulario({
   const fijar = (nombre: string, valor: unknown) =>
     setValores((prev) => ({ ...prev, [nombre]: valor }));
 
+  const validar = (): boolean => {
+    const errores: Record<string, string> = {};
+    for (const campo of recurso.campos) {
+      const valor = String(valores[campo.nombre] ?? "").trim();
+      const esTexto =
+        campo.tipo === "texto" ||
+        campo.tipo === "textarea" ||
+        campo.tipo === "select";
+
+      if (esTexto && !campo.opcional && !valor) {
+        errores[campo.nombre] = "Este campo es obligatorio.";
+      } else if (esTexto && valor && campo.maximo && valor.length > campo.maximo) {
+        errores[campo.nombre] = `Máximo ${campo.maximo} caracteres (llevas ${valor.length}).`;
+      } else if (esTexto && valor && campo.patron && !campo.patron.test(valor)) {
+        errores[campo.nombre] = campo.mensajePatron ?? "Formato no válido.";
+      } else if (campo.tipo === "numero") {
+        const numero = Number(valores[campo.nombre]);
+        if (!Number.isInteger(numero) || numero < 0) {
+          errores[campo.nombre] = "Debe ser un número entero positivo.";
+        }
+      }
+    }
+    setErroresCampos(errores);
+
+    const primerError = Object.keys(errores)[0];
+    if (primerError) {
+      cuerpoRef.current
+        ?.querySelector<HTMLElement>(`#campo-${primerError}`)
+        ?.focus();
+      return false;
+    }
+    return true;
+  };
+
   const guardar = async () => {
     setError("");
+    if (!validar()) return;
     setGuardando(true);
     try {
       const cuerpo: Record<string, unknown> = {};
@@ -196,30 +234,38 @@ function Formulario({
 
               {campo.tipo === "texto" && (
                 <input
+                  id={`campo-${campo.nombre}`}
                   className={claseInput}
+                  aria-invalid={erroresCampos[campo.nombre] ? true : undefined}
                   value={String(valores[campo.nombre] ?? "")}
                   onChange={(e) => fijar(campo.nombre, e.target.value)}
                 />
               )}
               {campo.tipo === "textarea" && (
                 <textarea
+                  id={`campo-${campo.nombre}`}
                   className={claseInput}
                   rows={3}
+                  aria-invalid={erroresCampos[campo.nombre] ? true : undefined}
                   value={String(valores[campo.nombre] ?? "")}
                   onChange={(e) => fijar(campo.nombre, e.target.value)}
                 />
               )}
               {campo.tipo === "numero" && (
                 <input
+                  id={`campo-${campo.nombre}`}
                   type="number"
                   className={claseInput}
+                  aria-invalid={erroresCampos[campo.nombre] ? true : undefined}
                   value={Number(valores[campo.nombre] ?? 0)}
                   onChange={(e) => fijar(campo.nombre, e.target.value)}
                 />
               )}
               {campo.tipo === "select" && (
                 <select
+                  id={`campo-${campo.nombre}`}
                   className={claseInput}
+                  aria-invalid={erroresCampos[campo.nombre] ? true : undefined}
                   value={String(valores[campo.nombre] ?? "")}
                   onChange={(e) => fijar(campo.nombre, e.target.value)}
                 >
@@ -246,6 +292,11 @@ function Formulario({
                   valor={String(valores[campo.nombre] ?? "")}
                   onCambio={(url) => fijar(campo.nombre, url)}
                 />
+              )}
+              {erroresCampos[campo.nombre] && (
+                <p className="mt-1 text-sm text-red-600" role="alert">
+                  {erroresCampos[campo.nombre]}
+                </p>
               )}
             </div>
           ))}

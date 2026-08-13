@@ -125,6 +125,26 @@ export default function FormDonaciones() {
   const guardar = async () => {
     setError("");
     setMensaje("");
+
+    const errores: string[] = [];
+    if (!datos.intro.trim()) {
+      errores.push("El texto de introducción es obligatorio.");
+    }
+    const esCelularValido = (numero: string) => /^9\d{8}$/.test(numero.trim());
+    if (datos.yapeNumero && !esCelularValido(datos.yapeNumero)) {
+      errores.push("El número de Yape debe tener 9 dígitos y empezar con 9.");
+    }
+    if (datos.plinNumero && !esCelularValido(datos.plinNumero)) {
+      errores.push("El número de Plin debe tener 9 dígitos y empezar con 9.");
+    }
+    if (datos.paypalUrl && !/^https:\/\//.test(datos.paypalUrl.trim())) {
+      errores.push("El enlace de PayPal debe empezar con https://");
+    }
+    if (errores.length > 0) {
+      setError(errores.join(" "));
+      return;
+    }
+
     setGuardando(true);
     try {
       await api("/donaciones", {

@@ -1,15 +1,24 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { IsInt, IsOptional, IsString, MinLength } from 'class-validator';
+import {
+  IsInt,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class CrearMiembroDto {
   @IsString()
   @MinLength(2)
+  @MaxLength(120)
   nombre!: string;
 
   @IsString()
+  @MaxLength(60)
   usuarioRedes!: string;
 
   @IsString()
+  @MaxLength(80)
   rol!: string;
 
   @IsOptional()

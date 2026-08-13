@@ -8,6 +8,11 @@ export interface CampoRecurso {
   carpeta?: string;
   opcional?: boolean;
   enTabla?: boolean;
+  /** Largo máximo permitido (se valida antes de enviar). */
+  maximo?: number;
+  /** Patrón que debe cumplir el valor, con su mensaje de error. */
+  patron?: RegExp;
+  mensajePatron?: string;
 }
 
 export interface RecursoConfig {
@@ -36,7 +41,7 @@ export const RECURSOS: RecursoConfig[] = [
     etiqueta: "Banners de portada",
     endpoint: "/banners",
     campos: [
-      { nombre: "titulo", etiqueta: "Título", tipo: "texto", enTabla: true },
+      { nombre: "titulo", etiqueta: "Título", tipo: "texto", enTabla: true, maximo: 120 },
       { nombre: "etiqueta", etiqueta: "Etiqueta superior", tipo: "texto" },
       {
         nombre: "descripcion",
@@ -44,7 +49,14 @@ export const RECURSOS: RecursoConfig[] = [
         tipo: "textarea",
         opcional: true,
       },
-      { nombre: "enlace", etiqueta: "Enlace de destino", tipo: "texto" },
+      {
+        nombre: "enlace",
+        etiqueta: "Enlace de destino",
+        tipo: "texto",
+        maximo: 300,
+        patron: /^(\/|https?:\/\/)/,
+        mensajePatron: "Debe empezar con / o https://",
+      },
       {
         nombre: "textoBoton",
         etiqueta: "Texto del botón",
@@ -79,9 +91,16 @@ export const RECURSOS: RecursoConfig[] = [
     etiqueta: "Programas (mosaico)",
     endpoint: "/programas",
     campos: [
-      { nombre: "titulo", etiqueta: "Título", tipo: "texto", enTabla: true },
+      { nombre: "titulo", etiqueta: "Título", tipo: "texto", enTabla: true, maximo: 120 },
       { nombre: "subtitulo", etiqueta: "Subtítulo", tipo: "texto" },
-      { nombre: "enlace", etiqueta: "Enlace de destino", tipo: "texto" },
+      {
+        nombre: "enlace",
+        etiqueta: "Enlace de destino",
+        tipo: "texto",
+        maximo: 300,
+        patron: /^(\/|https?:\/\/)/,
+        mensajePatron: "Debe empezar con / o https://",
+      },
       {
         nombre: "variante",
         etiqueta: "Color (sin imagen)",
@@ -110,7 +129,7 @@ export const RECURSOS: RecursoConfig[] = [
     etiqueta: "Actividades",
     endpoint: "/actividades",
     campos: [
-      { nombre: "titulo", etiqueta: "Título", tipo: "texto", enTabla: true },
+      { nombre: "titulo", etiqueta: "Título", tipo: "texto", enTabla: true, maximo: 120 },
       { nombre: "resumen", etiqueta: "Resumen corto", tipo: "textarea" },
       {
         nombre: "descripcion",
@@ -180,7 +199,7 @@ export const RECURSOS: RecursoConfig[] = [
     etiqueta: "Valores",
     endpoint: "/valores",
     campos: [
-      { nombre: "titulo", etiqueta: "Título", tipo: "texto", enTabla: true },
+      { nombre: "titulo", etiqueta: "Título", tipo: "texto", enTabla: true, maximo: 120 },
       { nombre: "descripcion", etiqueta: "Descripción", tipo: "textarea" },
       { nombre: "orden", etiqueta: "Orden", tipo: "numero", enTabla: true },
     ],

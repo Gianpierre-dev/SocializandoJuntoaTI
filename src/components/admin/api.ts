@@ -71,6 +71,8 @@ const TIPOS_IMAGEN: Record<string, string> = {
   webp: "image/webp",
 };
 
+const PESO_MAXIMO_MB = 5;
+
 /** Sube una imagen a Wasabi vía presigned URL y devuelve la URL pública. */
 export async function subirImagen(
   carpeta: string,
@@ -81,13 +83,19 @@ export async function subirImagen(
   if (!tipo) {
     throw new Error("Formato no permitido. Usa png, jpg, jpeg o webp.");
   }
+  if (archivo.size > PESO_MAXIMO_MB * 1024 * 1024) {
+    const pesoMb = (archivo.size / 1024 / 1024).toFixed(1);
+    throw new Error(
+      `La imagen pesa ${pesoMb} MB y el máximo es ${PESO_MAXIMO_MB} MB. Comprímela e inténtalo de nuevo.`,
+    );
+  }
 
   const { urlSubida, urlPublica } = await api<{
     urlSubida: string;
     urlPublica: string;
   }>("/almacenamiento/url-subida", {
     method: "POST",
-    body: JSON.stringify({ carpeta, extension }),
+    body: JSON.stringify({ carpeta, extension, peso: archivo.size }),
   });
 
   const subida = await fetch(urlSubida, {

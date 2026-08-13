@@ -62,6 +62,7 @@ export class AlmacenamientoService {
   async generarUrlSubida(
     carpeta: string,
     extension: string,
+    peso: number,
   ): Promise<UrlSubida> {
     const extensionNormalizada = extension.toLowerCase().replace(/^\./, '');
     if (!EXTENSIONES_PERMITIDAS.has(extensionNormalizada)) {
@@ -71,14 +72,18 @@ export class AlmacenamientoService {
     }
 
     const clave = `${carpeta}/${randomUUID()}.${extensionNormalizada}`;
+    // ContentLength firmado: la subida solo acepta exactamente el peso
+    // declarado (el límite de 5 MB se valida en el DTO).
     const comando = new PutObjectCommand({
       Bucket: this.bucket,
       Key: clave,
       ContentType: TIPOS_IMAGEN[extensionNormalizada],
+      ContentLength: peso,
     });
 
     const urlSubida = await getSignedUrl(this.cliente, comando, {
       expiresIn: 300,
+      signableHeaders: new Set(['content-length', 'content-type', 'host']),
     });
 
     return {
