@@ -54,6 +54,8 @@ const ctaVariants = {
                     href={banner.enlace}
                     class="relative block aspect-[10/3] overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand"
                   >
+                    {/* El primer banner lleva el h1 aunque sea imagen (SEO/a11y) */}
+                    {index === 0 && <h1 class="sr-only">{banner.titulo}</h1>}
                     {/* Fondo difuminado: rellena el marco sin recortar la imagen real */}
                     <img
                       src={banner.imagenUrl}
