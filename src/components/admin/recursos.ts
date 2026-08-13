@@ -20,6 +20,10 @@ export interface RecursoConfig {
   etiqueta: string;
   endpoint: string;
   campos: CampoRecurso[];
+  /** El recurso se reordena con las flechas de la tabla. */
+  ordenable?: boolean;
+  /** Página del sitio donde se ve este contenido. */
+  enlaceSitio?: string;
 }
 
 const VARIANTES_BANNER = [
@@ -38,6 +42,8 @@ const VARIANTES_TILE = [
 export const RECURSOS: RecursoConfig[] = [
   {
     clave: "banners",
+    ordenable: true,
+    enlaceSitio: "/",
     etiqueta: "Banners de portada",
     endpoint: "/banners",
     campos: [
@@ -82,12 +88,13 @@ export const RECURSOS: RecursoConfig[] = [
         tipo: "texto",
         opcional: true,
       },
-      { nombre: "orden", etiqueta: "Orden", tipo: "numero", enTabla: true },
       { nombre: "activo", etiqueta: "Activo", tipo: "booleano", enTabla: true },
     ],
   },
   {
     clave: "programas",
+    ordenable: true,
+    enlaceSitio: "/",
     etiqueta: "Programas (mosaico)",
     endpoint: "/programas",
     campos: [
@@ -120,12 +127,13 @@ export const RECURSOS: RecursoConfig[] = [
         tipo: "texto",
         opcional: true,
       },
-      { nombre: "orden", etiqueta: "Orden", tipo: "numero", enTabla: true },
       { nombre: "activo", etiqueta: "Activo", tipo: "booleano", enTabla: true },
     ],
   },
   {
     clave: "actividades",
+    ordenable: true,
+    enlaceSitio: "/actividades",
     etiqueta: "Actividades",
     endpoint: "/actividades",
     campos: [
@@ -157,11 +165,12 @@ export const RECURSOS: RecursoConfig[] = [
         ],
         enTabla: true,
       },
-      { nombre: "orden", etiqueta: "Orden", tipo: "numero", enTabla: true },
     ],
   },
   {
     clave: "equipo",
+    ordenable: true,
+    enlaceSitio: "/nosotros#equipo",
     etiqueta: "Equipo",
     endpoint: "/equipo",
     campos: [
@@ -175,11 +184,12 @@ export const RECURSOS: RecursoConfig[] = [
         carpeta: "equipo",
         opcional: true,
       },
-      { nombre: "orden", etiqueta: "Orden", tipo: "numero", enTabla: true },
     ],
   },
   {
     clave: "aliados",
+    ordenable: true,
+    enlaceSitio: "/nosotros",
     etiqueta: "Aliados",
     endpoint: "/aliados",
     campos: [
@@ -191,17 +201,17 @@ export const RECURSOS: RecursoConfig[] = [
         tipo: "texto",
         opcional: true,
       },
-      { nombre: "orden", etiqueta: "Orden", tipo: "numero", enTabla: true },
     ],
   },
   {
     clave: "valores",
+    ordenable: true,
+    enlaceSitio: "/nosotros",
     etiqueta: "Valores",
     endpoint: "/valores",
     campos: [
       { nombre: "titulo", etiqueta: "Título", tipo: "texto", enTabla: true, maximo: 120 },
       { nombre: "descripcion", etiqueta: "Descripción", tipo: "textarea" },
-      { nombre: "orden", etiqueta: "Orden", tipo: "numero", enTabla: true },
     ],
   },
 ];

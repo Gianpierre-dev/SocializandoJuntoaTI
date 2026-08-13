@@ -5,7 +5,14 @@ import CrudRecurso from "./crud-recurso";
 import FormDonaciones from "./form-donaciones";
 import ListaPostulaciones from "./lista-postulaciones";
 import FormSitio from "./form-sitio";
-import { Toasts } from "./ui";
+import {
+  ModalConfirmacion,
+  Toasts,
+  hayCambiosSinGuardar,
+  marcarSucio,
+  useBloqueoScroll,
+} from "./ui";
+import { useEffect } from "react";
 
 function IconoOjo({ tachado }: { tachado: boolean }) {
   return (
@@ -201,6 +208,19 @@ export default function PanelAdmin() {
   );
   const [seccion, setSeccion] = useState(SECCIONES[0].clave);
   const [menuAbierto, setMenuAbierto] = useState(false);
+  /** Sección (o "__salir__") pendiente de confirmar por cambios sin guardar. */
+  const [pendiente, setPendiente] = useState<string | null>(null);
+
+  // Aviso del navegador si cierran la pestaña con cambios sin guardar.
+  useEffect(() => {
+    const alCerrarPestana = (evento: BeforeUnloadEvent) => {
+      if (hayCambiosSinGuardar()) evento.preventDefault();
+    };
+    window.addEventListener("beforeunload", alCerrarPestana);
+    return () => window.removeEventListener("beforeunload", alCerrarPestana);
+  }, []);
+
+  useBloqueoScroll(menuAbierto);
 
   if (!autenticado) {
     return <PantallaLogin onIngreso={() => setAutenticado(true)} />;
@@ -209,10 +229,26 @@ export default function PanelAdmin() {
   const recursoActivo = RECURSOS.find((recurso) => recurso.clave === seccion);
   const seccionActiva = SECCIONES.find((s) => s.clave === seccion);
 
-  const salir = () => {
-    cerrarSesion();
-    setAutenticado(false);
+  const ejecutarNavegacion = (destino: string) => {
+    marcarSucio(false);
+    if (destino === "__salir__") {
+      cerrarSesion();
+      setAutenticado(false);
+    } else {
+      setSeccion(destino);
+    }
   };
+
+  /** Navega protegiendo los cambios sin guardar del formulario activo. */
+  const navegar = (destino: string) => {
+    if (hayCambiosSinGuardar()) {
+      setPendiente(destino);
+    } else {
+      ejecutarNavegacion(destino);
+    }
+  };
+
+  const salir = () => navegar("__salir__");
 
   const navegacion = (
     <>
@@ -221,7 +257,7 @@ export default function PanelAdmin() {
           key={s.clave}
           type="button"
           onClick={() => {
-            setSeccion(s.clave);
+            navegar(s.clave);
             setMenuAbierto(false);
           }}
           className={`mb-1 block w-full rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors ${
@@ -279,11 +315,19 @@ export default function PanelAdmin() {
 
       {/* Menú móvil desplegable */}
       {menuAbierto && (
-        <div className="fixed inset-0 top-[57px] z-30 bg-brand-deep p-4 md:hidden">
+        <div className="fixed inset-0 top-[57px] z-30 overflow-y-auto bg-brand-deep p-4 md:hidden">
           <nav aria-label="Secciones del panel">{navegacion}</nav>
+          <a
+            href="/"
+            target="_blank"
+            rel="noopener"
+            className="mt-4 block w-full rounded-lg border border-white/20 px-3 py-2.5 text-center text-sm font-medium text-white/70 hover:text-white"
+          >
+            Ver sitio ↗
+          </a>
           <button
             type="button"
-            className="mt-4 w-full rounded-lg border border-white/20 px-3 py-2.5 text-sm font-medium text-white/70 hover:text-white"
+            className="mt-2 w-full rounded-lg border border-white/20 px-3 py-2.5 text-sm font-medium text-white/70 hover:text-white"
             onClick={salir}
           >
             Cerrar sesión
@@ -315,6 +359,26 @@ export default function PanelAdmin() {
           {navegacion}
         </nav>
         <div className="shrink-0 border-t border-white/10 p-4">
+          <a
+            href="/"
+            target="_blank"
+            rel="noopener"
+            className="mb-1 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+          >
+            <svg
+              className="h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M12 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6M11 13l9-9M15 4h5v5" />
+            </svg>
+            Ver sitio
+          </a>
           <button
             type="button"
             className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
@@ -348,6 +412,20 @@ export default function PanelAdmin() {
           <FormDonaciones />
         )}
       </main>
+
+      {pendiente && (
+        <ModalConfirmacion
+          titulo="Cambios sin guardar"
+          mensaje="Tienes cambios sin guardar en este formulario. Si sales ahora, se perderán."
+          etiquetaConfirmar="Salir sin guardar"
+          onConfirmar={() => {
+            const destino = pendiente;
+            setPendiente(null);
+            ejecutarNavegacion(destino);
+          }}
+          onCancelar={() => setPendiente(null)}
+        />
+      )}
 
       <Toasts />
     </div>

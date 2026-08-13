@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "./api";
-import { AreaTextoAuto, mostrarToast } from "./ui";
+import { AreaTextoAuto, marcarSucio, mostrarToast } from "./ui";
 
 interface AreaTrabajo {
   titulo: string;
@@ -133,15 +133,29 @@ function ListaTextos({
 
 export default function FormSitio() {
   const [datos, setDatos] = useState<Configuracion | null>(null);
+  const [snapshot, setSnapshot] = useState("");
   const [error, setError] = useState("");
   const [mensaje, setMensaje] = useState("");
   const [guardando, setGuardando] = useState(false);
+
+  const hayCambios = datos !== null && JSON.stringify(datos) !== snapshot;
+
+  const cargarDatos = (config: Configuracion) => {
+    setDatos(config);
+    setSnapshot(JSON.stringify(config));
+  };
+
+  // Publica el estado sucio para el guard de navegación del panel.
+  useEffect(() => {
+    marcarSucio(hayCambios);
+    return () => marcarSucio(false);
+  }, [hayCambios]);
 
   useEffect(() => {
     api<ConfiguracionApi | null>("/configuracion")
       .then((r) => {
         if (!r) throw new Error("Sin configuración");
-        setDatos({
+        cargarDatos({
           nombre: r.nombre,
           eslogan: r.eslogan,
           fechaFundacion: r.fechaFundacion,
@@ -212,6 +226,7 @@ export default function FormSitio() {
       });
       setMensaje("Cambios guardados. El sitio ya los muestra.");
       mostrarToast("Datos generales actualizados");
+      setSnapshot(JSON.stringify(datos));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error al guardar");
     } finally {
@@ -345,9 +360,15 @@ export default function FormSitio() {
                 key={indice}
                 className="space-y-2 rounded-xl border border-line bg-white p-4"
               >
+                <label
+                  htmlFor={`area-${indice}-titulo`}
+                  className="block text-xs font-medium text-content/70"
+                >
+                  Nombre del área
+                </label>
                 <input
+                  id={`area-${indice}-titulo`}
                   className={`${claseInput} mt-0`}
-                  placeholder="Nombre del área"
                   value={area.titulo}
                   onChange={(e) =>
                     fijar({
@@ -357,10 +378,16 @@ export default function FormSitio() {
                     })
                   }
                 />
+                <label
+                  htmlFor={`area-${indice}-descripcion`}
+                  className="block text-xs font-medium text-content/70"
+                >
+                  Descripción
+                </label>
                 <AreaTextoAuto
+                  id={`area-${indice}-descripcion`}
                   className={`${claseInput} mt-0`}
                   rows={2}
-                  placeholder="Descripción del área"
                   value={area.descripcion}
                   onChange={(e) =>
                     fijar({
@@ -389,17 +416,44 @@ export default function FormSitio() {
         </div>
       </div>
 
-      {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
-      {mensaje && <p className="mt-4 text-sm text-green-700">{mensaje}</p>}
+      {error && (
+        <p role="alert" className="mt-4 text-sm text-red-600">
+          {error}
+        </p>
+      )}
 
-      <button
-        type="button"
-        className="mt-6 rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-deep disabled:opacity-50"
-        disabled={guardando}
-        onClick={() => void guardar()}
-      >
-        {guardando ? "Guardando…" : "Guardar cambios"}
-      </button>
+      {/* Barra de acciones fija: Guardar siempre visible */}
+      <div className="sticky bottom-0 z-10 -mx-6 mt-8 flex items-center justify-between gap-3 border-t border-line bg-white/95 px-6 py-3 backdrop-blur sm:-mx-10 sm:px-10">
+        <p
+          className={`text-sm font-medium ${
+            hayCambios ? "text-gold" : "text-content/60"
+          }`}
+          role="status"
+        >
+          {hayCambios ? "● Tienes cambios sin guardar" : mensaje || "Todo guardado"}
+        </p>
+        <div className="flex shrink-0 items-center gap-3">
+          {hayCambios && (
+            <button
+              type="button"
+              className="rounded-lg border border-line px-4 py-2 text-sm font-medium text-content hover:bg-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+              onClick={() =>
+                setDatos(JSON.parse(snapshot) as Configuracion)
+              }
+            >
+              Descartar
+            </button>
+          )}
+          <button
+            type="button"
+            className="rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-deep disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
+            disabled={guardando || !hayCambios}
+            onClick={() => void guardar()}
+          >
+            {guardando ? "Guardando…" : "Guardar cambios"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

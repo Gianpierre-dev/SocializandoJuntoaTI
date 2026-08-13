@@ -120,8 +120,21 @@ export default function ListaPostulaciones() {
                       · {p.edad} años
                     </span>
                   </p>
-                  <p className="mt-0.5 text-sm text-content/70">
-                    {p.correo} · {p.celular}
+                  <p className="mt-0.5 flex flex-wrap gap-x-3 gap-y-1 text-sm">
+                    <a
+                      href={`mailto:${p.correo}`}
+                      className="font-medium text-accent underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                    >
+                      ✉ {p.correo}
+                    </a>
+                    <a
+                      href={`https://wa.me/51${p.celular}`}
+                      target="_blank"
+                      rel="noopener"
+                      className="font-medium text-green underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                    >
+                      ☎ WhatsApp {p.celular}
+                    </a>
                   </p>
                 </div>
                 <p className="text-xs text-content/50">

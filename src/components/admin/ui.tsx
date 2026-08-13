@@ -1,5 +1,63 @@
 import { useEffect, useRef, useState } from "react";
 
+/* ---------- Cambios sin guardar (estado global simple) ---------- */
+
+let formularioSucio = false;
+
+/** Los formularios marcan aquí si tienen cambios sin guardar. */
+export const marcarSucio = (sucio: boolean): void => {
+  formularioSucio = sucio;
+};
+
+export const hayCambiosSinGuardar = (): boolean => formularioSucio;
+
+/* ---------- Bloqueo del scroll de fondo mientras hay un diálogo ---------- */
+
+export function useBloqueoScroll(activo: boolean): void {
+  useEffect(() => {
+    if (!activo) return;
+    const previo = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previo;
+    };
+  }, [activo]);
+}
+
+/* ---------- Trampa de foco para diálogos ---------- */
+
+export function useTrampaFoco(
+  ref: React.RefObject<HTMLElement | null>,
+): void {
+  useEffect(() => {
+    const disparador = document.activeElement as HTMLElement | null;
+
+    const alTeclear = (evento: KeyboardEvent) => {
+      if (evento.key !== "Tab" || !ref.current) return;
+      const focusables = ref.current.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      );
+      if (focusables.length === 0) return;
+      const primero = focusables[0];
+      const ultimo = focusables[focusables.length - 1];
+      if (evento.shiftKey && document.activeElement === primero) {
+        evento.preventDefault();
+        ultimo.focus();
+      } else if (!evento.shiftKey && document.activeElement === ultimo) {
+        evento.preventDefault();
+        primero.focus();
+      }
+    };
+
+    document.addEventListener("keydown", alTeclear);
+    return () => {
+      document.removeEventListener("keydown", alTeclear);
+      disparador?.focus?.();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+}
+
 /* ---------- Textarea que crece con el contenido (sin scroll interno) ---------- */
 
 interface PropsAreaTexto
@@ -107,6 +165,10 @@ export function ModalConfirmacion({
   onConfirmar,
   onCancelar,
 }: PropsConfirmacion) {
+  const dialogoRef = useRef<HTMLDivElement>(null);
+  useBloqueoScroll(true);
+  useTrampaFoco(dialogoRef);
+
   useEffect(() => {
     const alTeclear = (evento: KeyboardEvent) => {
       if (evento.key === "Escape") onCancelar();
@@ -125,7 +187,10 @@ export function ModalConfirmacion({
         if (evento.target === evento.currentTarget) onCancelar();
       }}
     >
-      <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+      <div
+        ref={dialogoRef}
+        className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl"
+      >
         <div className="flex items-start gap-3">
           <span
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-600"

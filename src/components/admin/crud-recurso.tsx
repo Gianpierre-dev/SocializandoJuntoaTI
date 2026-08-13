@@ -6,6 +6,8 @@ import {
   ModalConfirmacion,
   SkeletonTabla,
   mostrarToast,
+  useBloqueoScroll,
+  useTrampaFoco,
 } from "./ui";
 import type { CampoRecurso, RecursoConfig } from "./recursos";
 
@@ -121,11 +123,14 @@ function CampoImagen({
 function Formulario({
   recurso,
   registro,
+  siguienteOrden,
   onGuardado,
   onCancelar,
 }: {
   recurso: RecursoConfig;
   registro: Registro | null;
+  /** Orden asignado automáticamente a los registros nuevos (final de la lista). */
+  siguienteOrden: number;
   onGuardado: () => void;
   onCancelar: () => void;
 }) {
@@ -146,19 +151,38 @@ function Formulario({
   const [erroresCampos, setErroresCampos] = useState<Record<string, string>>(
     {},
   );
+  const [confirmarDescarte, setConfirmarDescarte] = useState(false);
   const cuerpoRef = useRef<HTMLDivElement>(null);
+  const dialogoRef = useRef<HTMLDivElement>(null);
+  const snapshotRef = useRef("");
 
-  // Foco al primer campo al abrir; Escape cierra.
+  useBloqueoScroll(true);
+  useTrampaFoco(dialogoRef);
+
+  /** Cierra directo si no hay cambios; pide confirmación si los hay. */
+  const intentarCancelar = useCallback(() => {
+    const sucio = JSON.stringify(valores) !== snapshotRef.current;
+    if (sucio) setConfirmarDescarte(true);
+    else onCancelar();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [valores, onCancelar]);
+
+  // Foco al primer campo al abrir; Escape intenta cerrar (con guard de cambios).
   useEffect(() => {
+    snapshotRef.current = JSON.stringify(valores);
     cuerpoRef.current
       ?.querySelector<HTMLElement>("input, select, textarea")
       ?.focus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     const alTeclear = (evento: KeyboardEvent) => {
-      if (evento.key === "Escape") onCancelar();
+      if (evento.key === "Escape") intentarCancelar();
     };
     document.addEventListener("keydown", alTeclear);
     return () => document.removeEventListener("keydown", alTeclear);
-  }, [onCancelar]);
+  }, [intentarCancelar]);
 
   const fijar = (nombre: string, valor: unknown) =>
     setValores((prev) => ({ ...prev, [nombre]: valor }));
@@ -210,6 +234,8 @@ function Formulario({
           cuerpo[campo.nombre] = undefined;
         else cuerpo[campo.nombre] = valor;
       }
+      // Los registros nuevos van al final de la lista.
+      if (!registro && recurso.ordenable) cuerpo.orden = siguienteOrden;
       if (registro) {
         await api(`${recurso.endpoint}/${registro.id}`, {
           method: "PATCH",
@@ -237,10 +263,13 @@ function Formulario({
       aria-modal="true"
       aria-label={registro ? "Editar registro" : "Nuevo registro"}
       onClick={(evento) => {
-        if (evento.target === evento.currentTarget) onCancelar();
+        if (evento.target === evento.currentTarget) intentarCancelar();
       }}
     >
-      <div className="flex max-h-[92dvh] w-full flex-col rounded-t-2xl bg-white shadow-xl sm:max-w-lg sm:rounded-2xl">
+      <div
+        ref={dialogoRef}
+        className="flex max-h-[92dvh] w-full flex-col rounded-t-2xl bg-white shadow-xl sm:max-w-lg sm:rounded-2xl"
+      >
         {/* Header fijo del modal */}
         <header className="flex shrink-0 items-center justify-between gap-4 border-b border-line px-5 py-4 sm:px-6">
           <h2 className="text-lg font-bold text-content">
@@ -250,7 +279,7 @@ function Formulario({
             type="button"
             aria-label="Cerrar"
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-content/60 hover:bg-subtle hover:text-content focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-            onClick={onCancelar}
+            onClick={intentarCancelar}
           >
             <svg
               className="h-5 w-5"
@@ -273,10 +302,13 @@ function Formulario({
         >
           {recurso.campos.map((campo) => (
             <div key={campo.nombre}>
-              <label className="mb-1 block text-sm font-medium text-content">
+              <label
+                htmlFor={`campo-${campo.nombre}`}
+                className="mb-1 block text-sm font-medium text-content"
+              >
                 {campo.etiqueta}
                 {campo.opcional && (
-                  <span className="text-content/50"> (opcional)</span>
+                  <span className="text-content/60"> (opcional)</span>
                 )}
               </label>
 
@@ -342,7 +374,11 @@ function Formulario({
                 />
               )}
               {erroresCampos[campo.nombre] && (
-                <p className="mt-1 text-sm text-red-600" role="alert">
+                <p
+                  id={`campo-${campo.nombre}-error`}
+                  className="mt-1 text-sm text-red-600"
+                  role="alert"
+                >
                   {erroresCampos[campo.nombre]}
                 </p>
               )}
@@ -376,6 +412,16 @@ function Formulario({
           </div>
         </footer>
       </div>
+
+      {confirmarDescarte && (
+        <ModalConfirmacion
+          titulo="Descartar cambios"
+          mensaje="Tienes cambios sin guardar en este formulario. ¿Quieres descartarlos?"
+          etiquetaConfirmar="Descartar"
+          onConfirmar={onCancelar}
+          onCancelar={() => setConfirmarDescarte(false)}
+        />
+      )}
     </div>
   );
 }
@@ -419,29 +465,41 @@ export default function CrudRecurso({ recurso }: { recurso: RecursoConfig }) {
     }
   };
 
-  const tieneOrden = recurso.campos.some((campo) => campo.nombre === "orden");
+  const tieneOrden = Boolean(recurso.ordenable);
+  const [moviendo, setMoviendo] = useState(false);
 
-  /** Intercambia el orden con el registro vecino (flechas de la tabla). */
+  /**
+   * Mueve el registro a la posición vecina y reindexa TODA la lista 1..n:
+   * así se corrigen también órdenes duplicados o con huecos.
+   */
   const mover = async (indice: number, direccion: -1 | 1) => {
-    const actual = registros[indice];
-    const vecino = registros[indice + direccion];
-    if (!actual || !vecino) return;
+    const destino = indice + direccion;
+    if (moviendo || destino < 0 || destino >= registros.length) return;
+    setMoviendo(true);
     try {
-      await Promise.all([
-        api(`${recurso.endpoint}/${actual.id}`, {
-          method: "PATCH",
-          body: JSON.stringify({ orden: Number(vecino.orden) }),
-        }),
-        api(`${recurso.endpoint}/${vecino.id}`, {
-          method: "PATCH",
-          body: JSON.stringify({ orden: Number(actual.orden) }),
-        }),
-      ]);
+      const lista = [...registros];
+      [lista[indice], lista[destino]] = [lista[destino], lista[indice]];
+      for (let posicion = 0; posicion < lista.length; posicion++) {
+        if (Number(lista[posicion].orden) !== posicion + 1) {
+          await api(`${recurso.endpoint}/${lista[posicion].id}`, {
+            method: "PATCH",
+            body: JSON.stringify({ orden: posicion + 1 }),
+          });
+        }
+      }
       await cargar();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error al reordenar");
+    } finally {
+      setMoviendo(false);
     }
   };
+
+  const siguienteOrden =
+    registros.reduce(
+      (mayor, registro) => Math.max(mayor, Number(registro.orden) || 0),
+      0,
+    ) + 1;
 
   return (
     <div>
@@ -450,12 +508,24 @@ export default function CrudRecurso({ recurso }: { recurso: RecursoConfig }) {
           <h1 className="text-2xl font-bold text-content">
             {recurso.etiqueta}
           </h1>
-          {!cargando && (
-            <p className="mt-0.5 text-sm text-content/50">
-              {registros.length}{" "}
-              {registros.length === 1 ? "registro" : "registros"}
-            </p>
-          )}
+          <p className="mt-0.5 flex items-center gap-3 text-sm text-content/70">
+            {!cargando && (
+              <span>
+                {registros.length}{" "}
+                {registros.length === 1 ? "registro" : "registros"}
+              </span>
+            )}
+            {recurso.enlaceSitio && (
+              <a
+                href={recurso.enlaceSitio}
+                target="_blank"
+                rel="noopener"
+                className="font-medium text-accent underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+              >
+                Ver en el sitio ↗
+              </a>
+            )}
+          </p>
         </div>
         <button
           type="button"
@@ -471,7 +541,118 @@ export default function CrudRecurso({ recurso }: { recurso: RecursoConfig }) {
       {cargando ? (
         <SkeletonTabla />
       ) : (
-        <div className="mt-6 overflow-x-auto rounded-2xl border border-line bg-white shadow-sm">
+        <>
+        {/* Móvil: tarjetas apiladas (las tablas dejaban Eliminar fuera de pantalla) */}
+        <div className="mt-6 space-y-3 sm:hidden">
+          {registros.length === 0 && (
+            <div className="rounded-2xl border border-line bg-white px-4 py-10 text-center">
+              <p className="text-3xl" aria-hidden="true">🗂️</p>
+              <p className="mt-2 font-medium text-content/70">
+                Sin registros todavía
+              </p>
+              <p className="mt-1 text-sm text-content/60">
+                Usa el botón «+ Agregar» para crear el primero.
+              </p>
+            </div>
+          )}
+          {registros.map((registro, indiceFila) => {
+            const urlImagen = campoImagen
+              ? String(registro[campoImagen.nombre] ?? "")
+              : "";
+            const inicial = String(registro[campoTitulo] ?? "?")
+              .trim()
+              .charAt(0)
+              .toUpperCase();
+            return (
+              <article
+                key={registro.id}
+                className="rounded-2xl border border-line bg-white p-4 shadow-sm"
+              >
+                <div className="flex items-center gap-3">
+                  {campoImagen &&
+                    (urlImagen ? (
+                      <img
+                        src={urlImagen}
+                        alt=""
+                        loading="lazy"
+                        className={`h-12 w-14 border border-line object-cover ${
+                          miniaturaRedonda ? "h-12 w-12 rounded-full" : "rounded-lg"
+                        }`}
+                      />
+                    ) : (
+                      <span
+                        className={`flex h-12 w-14 items-center justify-center bg-brand/10 text-base font-bold text-accent ${
+                          miniaturaRedonda ? "h-12 w-12 rounded-full" : "rounded-lg"
+                        }`}
+                        aria-hidden="true"
+                      >
+                        {inicial}
+                      </span>
+                    ))}
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-content">
+                      {String(registro[campoTitulo] ?? "")}
+                    </p>
+                    <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-content/70">
+                      {columnas.slice(1).map((campo) => (
+                        <CeldaValor
+                          key={campo.nombre}
+                          campo={campo}
+                          registro={registro}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-3 flex items-center justify-between border-t border-line pt-3">
+                  {tieneOrden ? (
+                    <span className="inline-flex gap-1">
+                      <button
+                        type="button"
+                        aria-label="Subir en el orden"
+                        disabled={indiceFila === 0 || moviendo}
+                        className="flex h-9 w-9 items-center justify-center rounded-lg text-content/60 hover:bg-subtle disabled:opacity-25"
+                        onClick={() => void mover(indiceFila, -1)}
+                      >
+                        ▲
+                      </button>
+                      <button
+                        type="button"
+                        aria-label="Bajar en el orden"
+                        disabled={indiceFila === registros.length - 1 || moviendo}
+                        className="flex h-9 w-9 items-center justify-center rounded-lg text-content/60 hover:bg-subtle disabled:opacity-25"
+                        onClick={() => void mover(indiceFila, 1)}
+                      >
+                        ▼
+                      </button>
+                    </span>
+                  ) : (
+                    <span />
+                  )}
+                  <span className="inline-flex gap-2">
+                    <button
+                      type="button"
+                      className="rounded-lg bg-subtle px-3.5 py-2 text-sm font-semibold text-accent"
+                      onClick={() => setEditando(registro)}
+                    >
+                      Editar
+                    </button>
+                    <button
+                      type="button"
+                      className="rounded-lg px-3.5 py-2 text-sm font-semibold text-red-600 hover:bg-red-50"
+                      onClick={() => setEliminando(registro)}
+                    >
+                      Eliminar
+                    </button>
+                  </span>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+
+        {/* Escritorio: tabla */}
+        <div className="mt-6 hidden overflow-x-auto rounded-2xl border border-line bg-white shadow-sm sm:block">
           <table className="w-full text-left text-sm">
             <thead className="border-b border-line bg-subtle/60">
               <tr>
@@ -481,7 +662,7 @@ export default function CrudRecurso({ recurso }: { recurso: RecursoConfig }) {
                 {columnas.map((campo) => (
                   <th
                     key={campo.nombre}
-                    className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-content/50"
+                    className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-content/70"
                   >
                     {campo.etiqueta}
                   </th>
@@ -545,12 +726,12 @@ export default function CrudRecurso({ recurso }: { recurso: RecursoConfig }) {
                     <td className="px-4 py-2.5 text-right">
                       <div className="inline-flex items-center gap-2">
                         {tieneOrden && (
-                          <span className="mr-1 inline-flex flex-col">
+                          <span className="mr-1 inline-flex gap-1">
                             <button
                               type="button"
                               aria-label="Subir en el orden"
-                              disabled={indiceFila === 0}
-                              className="rounded px-1.5 text-content/40 hover:bg-subtle hover:text-accent disabled:opacity-25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                              disabled={indiceFila === 0 || moviendo}
+                              className="flex h-8 w-8 items-center justify-center rounded-lg text-content/60 hover:bg-subtle hover:text-accent disabled:opacity-25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                               onClick={() => void mover(indiceFila, -1)}
                             >
                               ▲
@@ -558,8 +739,10 @@ export default function CrudRecurso({ recurso }: { recurso: RecursoConfig }) {
                             <button
                               type="button"
                               aria-label="Bajar en el orden"
-                              disabled={indiceFila === registros.length - 1}
-                              className="rounded px-1.5 text-content/40 hover:bg-subtle hover:text-accent disabled:opacity-25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                              disabled={
+                                indiceFila === registros.length - 1 || moviendo
+                              }
+                              className="flex h-8 w-8 items-center justify-center rounded-lg text-content/60 hover:bg-subtle hover:text-accent disabled:opacity-25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                               onClick={() => void mover(indiceFila, 1)}
                             >
                               ▼
@@ -606,12 +789,14 @@ export default function CrudRecurso({ recurso }: { recurso: RecursoConfig }) {
             </tbody>
           </table>
         </div>
+        </>
       )}
 
       {(creando || editando) && (
         <Formulario
           recurso={recurso}
           registro={editando}
+          siguienteOrden={siguienteOrden}
           onGuardado={() => {
             setCreando(false);
             setEditando(null);

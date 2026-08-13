@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "./api";
 import SelectorImagen from "./selector-imagen";
-import { AreaTextoAuto, mostrarToast } from "./ui";
+import { AreaTextoAuto, marcarSucio, mostrarToast } from "./ui";
 
 interface Cuenta {
   banco: string;
@@ -93,14 +93,29 @@ function CampoCelular({
 
 export default function FormDonaciones() {
   const [datos, setDatos] = useState<Donaciones | null>(null);
+  const [snapshot, setSnapshot] = useState("");
   const [error, setError] = useState("");
+  const [errorIntro, setErrorIntro] = useState("");
   const [mensaje, setMensaje] = useState("");
   const [guardando, setGuardando] = useState(false);
+
+  const hayCambios = datos !== null && JSON.stringify(datos) !== snapshot;
+
+  // Publica el estado sucio para el guard de navegación del panel.
+  useEffect(() => {
+    marcarSucio(hayCambios);
+    return () => marcarSucio(false);
+  }, [hayCambios]);
+
+  const cargarDatos = (config: Donaciones) => {
+    setDatos(config);
+    setSnapshot(JSON.stringify(config));
+  };
 
   useEffect(() => {
     api<Donaciones | null>("/donaciones")
       .then((respuesta) =>
-        setDatos(
+        cargarDatos(
           respuesta ?? {
             intro: "",
             yapeNumero: "",
@@ -129,12 +144,15 @@ export default function FormDonaciones() {
 
   const guardar = async () => {
     setError("");
+    setErrorIntro("");
     setMensaje("");
 
-    const errores: string[] = [];
     if (!datos.intro.trim()) {
-      errores.push("El texto de introducción es obligatorio.");
+      setErrorIntro("El texto de introducción es obligatorio.");
+      document.getElementById("campo-intro")?.focus();
+      return;
     }
+    const errores: string[] = [];
     if (datos.yapeNumero && !esCelularValido(datos.yapeNumero)) {
       errores.push("El número de Yape debe tener 9 dígitos y empezar con 9.");
     }
@@ -173,6 +191,7 @@ export default function FormDonaciones() {
       });
       setMensaje("Cambios guardados correctamente.");
       mostrarToast("Donaciones actualizadas");
+      setSnapshot(JSON.stringify(datos));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error al guardar");
     } finally {
@@ -186,15 +205,25 @@ export default function FormDonaciones() {
 
       <div className="mt-6 space-y-6">
         <div>
-          <label className="mb-1 block text-sm font-medium text-content">
+          <label
+            htmlFor="campo-intro"
+            className="mb-1 block text-sm font-medium text-content"
+          >
             Texto de introducción
           </label>
           <AreaTextoAuto
+            id="campo-intro"
             className={claseInput}
             rows={3}
+            aria-invalid={errorIntro ? true : undefined}
             value={datos.intro}
             onChange={(e) => fijar({ intro: e.target.value })}
           />
+          {errorIntro && (
+            <p role="alert" className="mt-1 text-sm text-red-600">
+              {errorIntro}
+            </p>
+          )}
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2">
@@ -270,31 +299,39 @@ export default function FormDonaciones() {
             {datos.cuentas.map((cuenta, indice) => (
               <div
                 key={indice}
-                className="grid gap-2 rounded-xl border border-line bg-white p-4 sm:grid-cols-2"
+                className="grid gap-3 rounded-xl border border-line bg-white p-4 sm:grid-cols-2"
               >
                 {(
                   [
-                    ["banco", "Banco"],
-                    ["titular", "Titular"],
-                    ["numero", "Número de cuenta"],
-                    ["cci", "CCI"],
+                    ["banco", "Banco", "Ej.: BCP, Interbank"],
+                    ["titular", "Titular de la cuenta", "Nombre completo o razón social"],
+                    ["numero", "Número de cuenta", "Como aparece en el banco"],
+                    ["cci", "CCI (interbancario)", "20 dígitos"],
                   ] as const
-                ).map(([clave, etiqueta]) => (
-                  <input
-                    key={clave}
-                    className={claseInput}
-                    placeholder={etiqueta}
-                    value={cuenta[clave]}
-                    onChange={(e) =>
-                      fijar({
-                        cuentas: datos.cuentas.map((c, i) =>
-                          i === indice
-                            ? { ...c, [clave]: e.target.value }
-                            : c,
-                        ),
-                      })
-                    }
-                  />
+                ).map(([clave, etiqueta, ayuda]) => (
+                  <div key={clave}>
+                    <label
+                      htmlFor={`cuenta-${indice}-${clave}`}
+                      className="block text-xs font-medium text-content/70"
+                    >
+                      {etiqueta}
+                    </label>
+                    <input
+                      id={`cuenta-${indice}-${clave}`}
+                      className={claseInput}
+                      placeholder={ayuda}
+                      value={cuenta[clave]}
+                      onChange={(e) =>
+                        fijar({
+                          cuentas: datos.cuentas.map((c, i) =>
+                            i === indice
+                              ? { ...c, [clave]: e.target.value }
+                              : c,
+                          ),
+                        })
+                      }
+                    />
+                  </div>
                 ))}
                 <button
                   type="button"
@@ -381,17 +418,42 @@ export default function FormDonaciones() {
         </div>
       </div>
 
-      {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
-      {mensaje && <p className="mt-4 text-sm text-green-700">{mensaje}</p>}
+      {error && (
+        <p role="alert" className="mt-4 text-sm text-red-600">
+          {error}
+        </p>
+      )}
 
-      <button
-        type="button"
-        className="mt-6 rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-deep disabled:opacity-50"
-        disabled={guardando}
-        onClick={() => void guardar()}
-      >
-        {guardando ? "Guardando…" : "Guardar cambios"}
-      </button>
+      {/* Barra de acciones fija: Guardar siempre visible */}
+      <div className="sticky bottom-0 z-10 -mx-6 mt-8 flex items-center justify-between gap-3 border-t border-line bg-white/95 px-6 py-3 backdrop-blur sm:-mx-10 sm:px-10">
+        <p
+          className={`text-sm font-medium ${
+            hayCambios ? "text-gold" : "text-content/60"
+          }`}
+          role="status"
+        >
+          {hayCambios ? "● Tienes cambios sin guardar" : mensaje || "Todo guardado"}
+        </p>
+        <div className="flex shrink-0 items-center gap-3">
+          {hayCambios && (
+            <button
+              type="button"
+              className="rounded-lg border border-line px-4 py-2 text-sm font-medium text-content hover:bg-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+              onClick={() => setDatos(JSON.parse(snapshot) as Donaciones)}
+            >
+              Descartar
+            </button>
+          )}
+          <button
+            type="button"
+            className="rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-deep disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
+            disabled={guardando || !hayCambios}
+            onClick={() => void guardar()}
+          >
+            {guardando ? "Guardando…" : "Guardar cambios"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

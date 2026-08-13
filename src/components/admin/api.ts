@@ -39,7 +39,13 @@ export async function api<T>(
 
   if (respuesta.status === 401) {
     cerrarSesion();
-    window.location.reload();
+    // Aviso antes de recargar: el editor debe saber qué pasó con su trabajo.
+    const { mostrarToast } = await import("./ui");
+    mostrarToast(
+      "Tu sesión expiró. Vuelve a ingresar para continuar.",
+      "error",
+    );
+    window.setTimeout(() => window.location.reload(), 3000);
     throw new ErrorApi(401, "Sesión expirada");
   }
 
