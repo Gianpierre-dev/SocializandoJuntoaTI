@@ -52,15 +52,23 @@ const ctaVariants = {
                 {banner.imagenUrl ? (
                   <a
                     href={banner.enlace}
-                    class="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand"
+                    class="relative block aspect-[10/3] overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand"
                   >
+                    {/* Fondo difuminado: rellena el marco sin recortar la imagen real */}
+                    <img
+                      src={banner.imagenUrl}
+                      alt=""
+                      aria-hidden="true"
+                      loading={index === 0 ? "eager" : "lazy"}
+                      class="absolute inset-0 h-full w-full scale-110 object-cover opacity-50 blur-xl"
+                    />
                     <img
                       src={banner.imagenUrl}
                       alt={banner.textoAlternativo ?? banner.titulo}
                       width="1940"
                       height="582"
                       loading={index === 0 ? "eager" : "lazy"}
-                      class="aspect-[10/3] w-full object-cover"
+                      class="relative h-full w-full object-contain"
                     />
                   </a>
                 ) : (

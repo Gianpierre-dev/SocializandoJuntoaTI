@@ -74,15 +74,23 @@ const variantClasses: Record<string, string> = {
               {programa.imagenUrl ? (
                 <a
                   href={programa.enlace}
-                  class="block overflow-hidden rounded-xl shadow-sm transition-transform hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
+                  class="relative block aspect-[3/2] overflow-hidden rounded-xl shadow-sm transition-transform hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
                 >
+                  {/* Fondo difuminado: rellena el marco sin recortar la imagen real */}
+                  <img
+                    src={programa.imagenUrl}
+                    alt=""
+                    aria-hidden="true"
+                    loading="lazy"
+                    class="absolute inset-0 h-full w-full scale-110 object-cover opacity-50 blur-xl"
+                  />
                   <img
                     src={programa.imagenUrl}
                     alt={programa.textoAlternativo ?? programa.titulo}
                     width="924"
                     height="616"
                     loading="lazy"
-                    class="aspect-[3/2] w-full object-cover"
+                    class="relative h-full w-full object-contain"
                   />
                 </a>
               ) : (
