@@ -290,9 +290,9 @@ export default function PanelAdmin() {
         </div>
       )}
 
-      {/* Sidebar de escritorio */}
-      <aside className="hidden w-60 shrink-0 flex-col border-r border-line bg-brand-deep md:flex">
-        <div className="flex items-center gap-3 px-5 py-6">
+      {/* Sidebar de escritorio: fijo a pantalla completa, con scroll propio */}
+      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-line bg-brand-deep md:flex">
+        <div className="flex items-center gap-3 border-b border-white/10 px-5 py-5">
           <img
             src="/favicon.png?v=3"
             alt=""
@@ -300,22 +300,37 @@ export default function PanelAdmin() {
             height="40"
             className="h-10 w-10 shrink-0"
           />
-          <div>
-            <p className="text-sm font-bold text-white">
+          <div className="min-w-0">
+            <p className="text-sm font-bold leading-snug text-white">
               Socializando Junto A Ti
             </p>
-            <p className="text-xs text-white/60">Panel administrativo</p>
+            <p className="mt-0.5 text-xs text-white/60">Panel administrativo</p>
           </div>
         </div>
-        <nav className="flex-1 px-2" aria-label="Secciones del panel">
+        <nav
+          className="flex-1 overflow-y-auto px-3 py-4"
+          aria-label="Secciones del panel"
+        >
           {navegacion}
         </nav>
-        <div className="border-t border-white/10 p-4">
+        <div className="shrink-0 border-t border-white/10 p-4">
           <button
             type="button"
-            className="text-sm font-medium text-white/70 hover:text-white"
+            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
             onClick={salir}
           >
+            <svg
+              className="h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M14 8V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2v-2M9 12h12l-3-3m0 6l3-3" />
+            </svg>
             Cerrar sesión
           </button>
         </div>
