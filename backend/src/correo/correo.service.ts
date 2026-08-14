@@ -13,6 +13,18 @@ export interface DatosPostulacion {
 }
 
 /**
+ * Escapa texto antes de incrustarlo en el HTML del correo: los datos vienen
+ * de un formulario público y no deben poder inyectar marcado ni enlaces.
+ */
+const escapar = (texto: string): string =>
+  texto
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+
+/**
  * Envío de notificaciones por correo (SMTP). Si las credenciales no están
  * configuradas, el servicio queda inactivo y solo registra en el log: las
  * postulaciones nunca se pierden porque siempre se guardan en la base.
@@ -67,6 +79,14 @@ export class CorreoService {
     ];
     if (datos.mensaje) filas.push(['Mensaje', datos.mensaje]);
 
+    // Enlaces: solo dígitos en el teléfono y un correo con forma válida.
+    const telefono = datos.celular.replace(/\D/g, '');
+    const correoValido = /^[^\s@"'<>]+@[^\s@"'<>]+\.[^\s@"'<>]+$/.test(
+      datos.correo,
+    )
+      ? datos.correo
+      : '';
+
     const html = `
       <div style="font-family:system-ui,sans-serif;color:#2c2a5e">
         <h2 style="color:#4a3f88">Nueva postulación de voluntariado</h2>
@@ -75,15 +95,24 @@ export class CorreoService {
             .map(
               ([etiqueta, valor]) =>
                 `<tr>
-                   <td style="padding:6px 12px 6px 0;font-weight:600">${etiqueta}</td>
-                   <td style="padding:6px 0">${valor}</td>
+                   <td style="padding:6px 12px 6px 0;font-weight:600">${escapar(etiqueta)}</td>
+                   <td style="padding:6px 0">${escapar(valor)}</td>
                  </tr>`,
             )
             .join('')}
         </table>
         <p style="margin-top:16px">
-          <a href="https://wa.me/51${datos.celular}">Escribir por WhatsApp</a> ·
-          <a href="mailto:${datos.correo}">Responder por correo</a>
+          ${
+            telefono
+              ? `<a href="https://wa.me/51${escapar(telefono)}">Escribir por WhatsApp</a>`
+              : ''
+          }
+          ${telefono && correoValido ? ' · ' : ''}
+          ${
+            correoValido
+              ? `<a href="mailto:${escapar(correoValido)}">Responder por correo</a>`
+              : ''
+          }
         </p>
         <p style="color:#6b6b8a;font-size:13px">
           También puedes verla en el panel administrativo del sitio.
@@ -94,8 +123,12 @@ export class CorreoService {
       await this.transporte.sendMail({
         from: `"Socializando Junto A Ti" <${this.remitente}>`,
         to: this.destinatario,
-        replyTo: datos.correo,
-        subject: `Nueva postulación: ${datos.nombre} (${datos.area})`,
+        replyTo: correoValido || undefined,
+        // Sin saltos de línea en el asunto (evita inyección de cabeceras).
+        subject: `Nueva postulación: ${datos.nombre} (${datos.area})`.replace(
+          /[\r\n]+/g,
+          ' ',
+        ),
         html,
       });
       this.logger.log(`Postulación notificada a ${this.destinatario}`);
