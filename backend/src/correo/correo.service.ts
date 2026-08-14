@@ -33,22 +33,34 @@ const escapar = (texto: string): string =>
 export class CorreoService {
   private readonly logger = new Logger(CorreoService.name);
   private readonly transporte: Transporter | null;
+  private readonly claveResend: string | null;
   private readonly destinatario: string;
   private readonly remitente: string;
 
   constructor(private readonly config: ConfigService) {
     const usuario = this.config.get<string>('SMTP_USUARIO');
     const contrasena = this.config.get<string>('SMTP_CONTRASENA');
+    this.claveResend = this.config.get<string>('RESEND_API_KEY') ?? null;
+
     this.destinatario =
       this.config.get<string>('CORREO_NOTIFICACIONES') ??
       usuario ??
       'contacto.sojat@gmail.com';
-    this.remitente = usuario ?? 'no-reply@socializandojuntoati.org';
+    // Resend permite este remitente sin dominio propio verificado.
+    this.remitente =
+      this.config.get<string>('CORREO_REMITENTE') ??
+      (this.claveResend ? 'onboarding@resend.dev' : (usuario ?? ''));
+
+    if (this.claveResend) {
+      this.transporte = null;
+      this.logger.log('Notificaciones por correo activas (Resend)');
+      return;
+    }
 
     if (!usuario || !contrasena) {
       this.transporte = null;
       this.logger.warn(
-        'SMTP sin configurar: las postulaciones se guardan pero no se notifican por correo.',
+        'Correo sin configurar: las postulaciones se guardan pero no se notifican.',
       );
       return;
     }
@@ -59,15 +71,85 @@ export class CorreoService {
       secure: true,
       auth: { user: usuario, pass: contrasena },
     });
+    this.logger.log('Notificaciones por correo activas (SMTP)');
   }
 
   get activo(): boolean {
-    return this.transporte !== null;
+    return this.transporte !== null || this.claveResend !== null;
+  }
+
+  /** Envía por Resend (API HTTP) o por SMTP, según lo que esté configurado. */
+  private async enviar(
+    asunto: string,
+    html: string,
+    responderA?: string,
+  ): Promise<void> {
+    if (this.claveResend) {
+      const respuesta = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${this.claveResend}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: `Socializando Junto A Ti <${this.remitente}>`,
+          to: [this.destinatario],
+          subject: asunto,
+          html,
+          ...(responderA ? { reply_to: responderA } : {}),
+        }),
+      });
+      if (!respuesta.ok) {
+        throw new Error(
+          `Resend respondió ${respuesta.status}: ${await respuesta.text()}`,
+        );
+      }
+      return;
+    }
+
+    if (!this.transporte) return;
+    await this.transporte.sendMail({
+      from: `"Socializando Junto A Ti" <${this.remitente}>`,
+      to: this.destinatario,
+      replyTo: responderA,
+      subject: asunto,
+      html,
+    });
+  }
+
+  /** Envía un correo de prueba para verificar la configuración. */
+  async enviarPrueba(): Promise<{ enviado: boolean; detalle: string }> {
+    if (!this.activo) {
+      return {
+        enviado: false,
+        detalle:
+          'No hay proveedor configurado (falta RESEND_API_KEY o credenciales SMTP).',
+      };
+    }
+    try {
+      await this.enviar(
+        'Prueba de notificaciones · Socializando Junto A Ti',
+        `<div style="font-family:system-ui,sans-serif;color:#2c2a5e">
+           <h2 style="color:#4a3f88">Las notificaciones funcionan</h2>
+           <p>Si estás leyendo esto, cada nueva postulación de voluntariado
+              llegará a este buzón automáticamente.</p>
+         </div>`,
+      );
+      return {
+        enviado: true,
+        detalle: `Correo enviado a ${this.destinatario}`,
+      };
+    } catch (error) {
+      return {
+        enviado: false,
+        detalle: error instanceof Error ? error.message : 'Error desconocido',
+      };
+    }
   }
 
   /** Notifica una postulación nueva. Nunca lanza: no debe romper el registro. */
   async notificarPostulacion(datos: DatosPostulacion): Promise<void> {
-    if (!this.transporte) return;
+    if (!this.activo) return;
 
     const filas: [string, string][] = [
       ['Nombre', datos.nombre],
@@ -120,17 +202,13 @@ export class CorreoService {
       </div>`;
 
     try {
-      await this.transporte.sendMail({
-        from: `"Socializando Junto A Ti" <${this.remitente}>`,
-        to: this.destinatario,
-        replyTo: correoValido || undefined,
-        // Sin saltos de línea en el asunto (evita inyección de cabeceras).
-        subject: `Nueva postulación: ${datos.nombre} (${datos.area})`.replace(
+      // Sin saltos de línea en el asunto (evita inyección de cabeceras).
+      const asunto =
+        `Nueva postulación: ${datos.nombre} (${datos.area})`.replace(
           /[\r\n]+/g,
           ' ',
-        ),
-        html,
-      });
+        );
+      await this.enviar(asunto, html, correoValido || undefined);
       this.logger.log(`Postulación notificada a ${this.destinatario}`);
     } catch (error) {
       this.logger.error(
