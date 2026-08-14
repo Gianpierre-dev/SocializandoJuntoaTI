@@ -34,6 +34,7 @@ export class CorreoService {
   private readonly logger = new Logger(CorreoService.name);
   private readonly transporte: Transporter | null;
   private readonly claveResend: string | null;
+  private readonly usaFormsubmit: boolean;
   private readonly destinatario: string;
   private readonly remitente: string;
 
@@ -41,6 +42,8 @@ export class CorreoService {
     const usuario = this.config.get<string>('SMTP_USUARIO');
     const contrasena = this.config.get<string>('SMTP_CONTRASENA');
     this.claveResend = this.config.get<string>('RESEND_API_KEY') ?? null;
+    // Respaldo sin credenciales: requiere confirmar el buzón una sola vez.
+    this.usaFormsubmit = this.config.get<string>('USAR_FORMSUBMIT') === 'true';
 
     this.destinatario =
       this.config.get<string>('CORREO_NOTIFICACIONES') ??
@@ -59,9 +62,13 @@ export class CorreoService {
 
     if (!usuario || !contrasena) {
       this.transporte = null;
-      this.logger.warn(
-        'Correo sin configurar: las postulaciones se guardan pero no se notifican.',
-      );
+      if (this.usaFormsubmit) {
+        this.logger.log('Notificaciones por correo activas (FormSubmit)');
+      } else {
+        this.logger.warn(
+          'Correo sin configurar: las postulaciones se guardan pero no se notifican.',
+        );
+      }
       return;
     }
 
@@ -75,15 +82,51 @@ export class CorreoService {
   }
 
   get activo(): boolean {
-    return this.transporte !== null || this.claveResend !== null;
+    return (
+      this.transporte !== null ||
+      this.claveResend !== null ||
+      this.usaFormsubmit
+    );
   }
 
-  /** Envía por Resend (API HTTP) o por SMTP, según lo que esté configurado. */
+  /**
+   * Envía por el proveedor configurado. Orden de preferencia:
+   * Resend (API) → SMTP → FormSubmit (sin registro ni dominio propio).
+   */
   private async enviar(
     asunto: string,
     html: string,
     responderA?: string,
   ): Promise<void> {
+    if (!this.claveResend && !this.transporte && this.usaFormsubmit) {
+      const respuesta = await fetch(
+        `https://formsubmit.co/ajax/${encodeURIComponent(this.destinatario)}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify({
+            _subject: asunto,
+            _template: 'table',
+            _captcha: 'false',
+            ...(responderA ? { email: responderA } : {}),
+            mensaje: html
+              .replace(/<[^>]+>/g, ' ')
+              .replace(/\s+/g, ' ')
+              .trim(),
+          }),
+        },
+      );
+      if (!respuesta.ok) {
+        throw new Error(
+          `FormSubmit respondió ${respuesta.status}: ${await respuesta.text()}`,
+        );
+      }
+      return;
+    }
+
     if (this.claveResend) {
       const respuesta = await fetch('https://api.resend.com/emails', {
         method: 'POST',
