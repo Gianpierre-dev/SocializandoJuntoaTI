@@ -99,6 +99,11 @@ export class CorreoService {
     responderA?: string,
   ): Promise<void> {
     if (!this.claveResend && !this.transporte && this.usaFormsubmit) {
+      // FormSubmit exige cabeceras de origen web y responde 200 incluso al
+      // rechazar el envío, así que hay que revisar el cuerpo.
+      const sitio =
+        this.config.get<string>('SITIO_URL') ??
+        'https://socializando-junto-a-ti-production.up.railway.app';
       const respuesta = await fetch(
         `https://formsubmit.co/ajax/${encodeURIComponent(this.destinatario)}`,
         {
@@ -106,6 +111,8 @@ export class CorreoService {
           headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json',
+            Origin: sitio,
+            Referer: `${sitio}/voluntariado`,
           },
           body: JSON.stringify({
             _subject: asunto,
@@ -119,9 +126,13 @@ export class CorreoService {
           }),
         },
       );
-      if (!respuesta.ok) {
+      const cuerpo = (await respuesta.json().catch(() => null)) as {
+        success?: string;
+        message?: string;
+      } | null;
+      if (!respuesta.ok || cuerpo?.success === 'false') {
         throw new Error(
-          `FormSubmit respondió ${respuesta.status}: ${await respuesta.text()}`,
+          `FormSubmit: ${cuerpo?.message ?? `HTTP ${respuesta.status}`}`,
         );
       }
       return;
