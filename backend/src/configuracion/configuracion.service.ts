@@ -9,6 +9,7 @@ const INCLUIR_RELACIONES = {
   plataformas: { orderBy: { orden: 'asc' as const } },
   requisitos: { orderBy: { orden: 'asc' as const } },
   beneficios: { orderBy: { orden: 'asc' as const } },
+  beneficiosParticipante: { orderBy: { orden: 'asc' as const } },
   areas: { orderBy: { orden: 'asc' as const } },
 };
 
@@ -28,7 +29,15 @@ export class ConfiguracionService {
    * siempre envía el estado íntegro.
    */
   actualizar(dto: ActualizarConfiguracionDto) {
-    const { sedes, plataformas, requisitos, beneficios, areas, ...datos } = dto;
+    const {
+      sedes,
+      plataformas,
+      requisitos,
+      beneficios,
+      beneficiosParticipante,
+      areas,
+      ...datos
+    } = dto;
 
     return this.prisma.$transaction(async (tx) => {
       await tx.configuracionSitio.upsert({
@@ -47,6 +56,9 @@ export class ConfiguracionService {
         where: { configuracionId: ID_CONFIGURACION },
       });
       await tx.beneficioVoluntariado.deleteMany({
+        where: { configuracionId: ID_CONFIGURACION },
+      });
+      await tx.beneficioParticipante.deleteMany({
         where: { configuracionId: ID_CONFIGURACION },
       });
       await tx.areaTrabajo.deleteMany({
@@ -80,6 +92,11 @@ export class ConfiguracionService {
       if (beneficios.length > 0) {
         await tx.beneficioVoluntariado.createMany({
           data: beneficios.map((b) => conConfiguracion(b)),
+        });
+      }
+      if (beneficiosParticipante.length > 0) {
+        await tx.beneficioParticipante.createMany({
+          data: beneficiosParticipante.map((b) => conConfiguracion(b)),
         });
       }
       if (areas.length > 0) {

@@ -36,10 +36,24 @@ const pageDescription =
             {activities.map((activity) => (
               <li>
                 <article
-                  class={`flex h-full flex-col rounded-2xl border border-line bg-surface p-6 shadow-sm sm:p-8 ${
+                  class={`flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-sm ${
                     activity.proximamente ? "opacity-70" : ""
                   }`}
                 >
+                  {activity.imagenUrl && (
+                    <img
+                      src={activity.imagenUrl}
+                      alt={
+                        activity.textoAlternativo ??
+                        `Actividad: ${activity.titulo}`
+                      }
+                      width="1200"
+                      height="800"
+                      loading="lazy"
+                      class="aspect-[3/2] w-full object-cover"
+                    />
+                  )}
+                  <div class="flex flex-1 flex-col p-6 sm:p-8">
                   <div class="mb-3 flex flex-wrap items-center gap-2">
                     <span class="rounded-full bg-green/15 px-3 py-1 text-xs font-semibold text-green">
                       {modalityLabels[activity.modalidad]}
@@ -59,10 +73,20 @@ const pageDescription =
                     {activity.descripcion}
                   </p>
 
+                  {(activity.duracion || activity.frecuencia) && (
+                    <p class="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs text-content/60">
+                      {activity.duracion && <span>⏱ {activity.duracion}</span>}
+                      {activity.frecuencia && (
+                        <span>📅 {activity.frecuencia}</span>
+                      )}
+                    </p>
+                  )}
+
                   <p class="mt-6 border-t border-line pt-4 text-sm font-semibold text-accent">
-                    <span class="text-content/50">Costo:</span>{" "}
+                    <span class="text-content/60">Costo:</span>{" "}
                     {activity.costo}
                   </p>
+                  </div>
                 </article>
               </li>
             ))}
@@ -75,4 +99,41 @@ const pageDescription =
       }
     </div>
   </section>
+
+  <!-- Beneficios para quienes participan -->
+  {
+    site.participantBenefits.length > 0 && (
+      <section class="bg-subtle py-16 sm:py-20" aria-label="Qué ganas al participar">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6">
+          <SectionHeading
+            title="¿Qué ganas al participar?"
+            subtitle="Nuestras actividades están pensadas para que te lleves algo más que un buen momento."
+          />
+          <ul class="mt-12 grid gap-4 sm:grid-cols-2">
+            {site.participantBenefits.map((beneficio) => (
+              <li class="flex items-start gap-3 rounded-2xl bg-surface p-5 shadow-sm">
+                <span
+                  class="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-green/20 text-sm font-bold text-green"
+                  aria-hidden="true"
+                >
+                  &#10003;
+                </span>
+                <span class="text-base leading-relaxed text-content/80">
+                  {beneficio}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <p class="mt-10 text-center">
+            <a
+              href="/contacto"
+              class="inline-flex items-center justify-center rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
+            >
+              Quiero participar
+            </a>
+          </p>
+        </div>
+      </section>
+    )
+  }
 </BaseLayout>

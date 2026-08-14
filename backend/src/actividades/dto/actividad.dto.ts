@@ -1,5 +1,12 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { IsEnum, IsInt, IsString, MaxLength, MinLength } from 'class-validator';
+import {
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 import { EstadoActividad, Modalidad } from '@prisma/client';
 
 export class CrearActividadDto {
@@ -25,6 +32,26 @@ export class CrearActividadDto {
 
   @IsEnum(EstadoActividad)
   estado!: EstadoActividad;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(60)
+  duracion?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(80)
+  frecuencia?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(400)
+  imagenUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  textoAlternativo?: string;
 
   @IsInt()
   orden!: number;

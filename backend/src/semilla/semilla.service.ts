@@ -43,6 +43,77 @@ export class SemillaService implements OnApplicationBootstrap {
     await this.sembrarAdministrador();
     await this.sembrarContenido();
     await this.sembrarConfiguracionSitio();
+    await this.completarBeneficiosParticipante();
+    await this.completarDetallesActividades();
+  }
+
+  /** Añade los beneficios para participantes si la configuración ya existía. */
+  private async completarBeneficiosParticipante(): Promise<void> {
+    if ((await this.prisma.beneficioParticipante.count()) > 0) return;
+    const configuracion = await this.prisma.configuracionSitio.findUnique({
+      where: { id: 1 },
+    });
+    if (!configuracion) return;
+
+    const textos = [
+      'Acceso a talleres y actividades gratuitas y de bajo costo social.',
+      'Oportunidad de conectar con otros jóvenes y formar redes de apoyo.',
+      'Aprendizaje de herramientas prácticas personalizadas y grupales.',
+      'Participación en actividades recreativas que fomentan el bienestar emocional.',
+      'Oportunidad de conversar con un especialista de la salud mental.',
+      'Reconocimiento a los jóvenes más participativos en nuestras redes sociales.',
+      'Celebración de tu cumpleaños con nosotros.',
+    ];
+    await this.prisma.beneficioParticipante.createMany({
+      data: textos.map((texto, indice) => ({
+        texto,
+        orden: indice + 1,
+        configuracionId: 1,
+      })),
+    });
+    this.logger.log('Beneficios para participantes sembrados');
+  }
+
+  /** Completa duración y frecuencia según el documento oficial. */
+  private async completarDetallesActividades(): Promise<void> {
+    const detalles: Record<string, { duracion: string; frecuencia: string }> = {
+      'Picnics sociales': {
+        duracion: '2 a 3 horas',
+        frecuencia: 'Fines de semana, según cronograma',
+      },
+      'Gincanas deportivas': {
+        duracion: '2 a 3 horas',
+        frecuencia: 'Generalmente los fines de semana',
+      },
+      'Voluntariados sociales': {
+        duracion: '2 a 3 horas',
+        frecuencia: 'Según coordinación con las organizaciones aliadas',
+      },
+      'Conversatorios online': {
+        duracion: '1 a 2 horas',
+        frecuencia: 'Cada 2 semanas',
+      },
+      'Salidas de integración': {
+        duracion: '2 a 3 horas',
+        frecuencia: 'Fines de semana y feriados',
+      },
+      'Talleres online': {
+        duracion: '1 a 2 horas',
+        frecuencia: 'Cada 2 semanas',
+      },
+    };
+
+    for (const [titulo, datos] of Object.entries(detalles)) {
+      const actividad = await this.prisma.actividad.findFirst({
+        where: { titulo, duracion: null },
+      });
+      if (actividad) {
+        await this.prisma.actividad.update({
+          where: { id: actividad.id },
+          data: datos,
+        });
+      }
+    }
   }
 
   private async sembrarConfiguracionSitio(): Promise<void> {
@@ -92,6 +163,18 @@ export class SemillaService implements OnApplicationBootstrap {
         },
         requisitos: { create: ordenado(sitioInicial.requirements) },
         beneficios: { create: ordenado(sitioInicial.benefits) },
+        // Beneficios para participantes (documento oficial SOJAT 2026, 2.5).
+        beneficiosParticipante: {
+          create: ordenado([
+            'Acceso a talleres y actividades gratuitas y de bajo costo social.',
+            'Oportunidad de conectar con otros jóvenes y formar redes de apoyo.',
+            'Aprendizaje de herramientas prácticas personalizadas y grupales.',
+            'Participación en actividades recreativas que fomentan el bienestar emocional.',
+            'Oportunidad de conversar con un especialista de la salud mental.',
+            'Reconocimiento a los jóvenes más participativos en nuestras redes sociales.',
+            'Celebración de tu cumpleaños con nosotros.',
+          ]),
+        },
         areas: {
           create: sitioInicial.areas.map((area, indice) => ({
             titulo: area.title,

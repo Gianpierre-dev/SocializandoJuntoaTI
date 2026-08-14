@@ -165,6 +165,33 @@ export const RECURSOS: RecursoConfig[] = [
         ],
         enTabla: true,
       },
+      {
+        nombre: "duracion",
+        etiqueta: "Duración",
+        tipo: "texto",
+        opcional: true,
+        maximo: 60,
+      },
+      {
+        nombre: "frecuencia",
+        etiqueta: "Frecuencia",
+        tipo: "texto",
+        opcional: true,
+        maximo: 80,
+      },
+      {
+        nombre: "imagenUrl",
+        etiqueta: "Foto de la actividad (1200×800 recomendado)",
+        tipo: "imagen",
+        carpeta: "actividades",
+        opcional: true,
+      },
+      {
+        nombre: "textoAlternativo",
+        etiqueta: "Texto alternativo de la foto",
+        tipo: "texto",
+        opcional: true,
+      },
     ],
   },
   {

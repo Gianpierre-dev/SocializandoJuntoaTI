@@ -35,6 +35,10 @@ const hasMore = typeof limit === "number" && activities.length > limit;
               cost={activity.costo}
               modality={activity.modalidad}
               status={activity.proximamente ? "in-development" : "active"}
+              duracion={activity.duracion}
+              frecuencia={activity.frecuencia}
+              imagenUrl={activity.imagenUrl}
+              textoAlternativo={activity.textoAlternativo}
             />
           ))}
         </div>

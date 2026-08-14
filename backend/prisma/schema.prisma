@@ -80,16 +80,20 @@ model Programa {
 }
 
 model Actividad {
-  id            String          @id @default(uuid())
-  titulo        String
-  resumen       String
-  descripcion   String
-  costo         String
-  modalidad     Modalidad
-  estado        EstadoActividad @default(ACTIVA)
-  orden         Int
-  creadoEn      DateTime        @default(now())
-  actualizadoEn DateTime        @updatedAt
+  id               String          @id @default(uuid())
+  titulo           String
+  resumen          String
+  descripcion      String
+  costo            String
+  modalidad        Modalidad
+  estado           EstadoActividad @default(ACTIVA)
+  duracion         String?
+  frecuencia       String?
+  imagenUrl        String?
+  textoAlternativo String?
+  orden            Int
+  creadoEn         DateTime        @default(now())
+  actualizadoEn    DateTime        @updatedAt
 
   @@map("actividades")
 }
@@ -146,13 +150,24 @@ model ConfiguracionSitio {
   whatsappUrl     String?
   actualizadoEn   DateTime @updatedAt
 
-  sedes       Sede[]
-  plataformas PlataformaOnline[]
-  requisitos  RequisitoVoluntariado[]
-  beneficios  BeneficioVoluntariado[]
-  areas       AreaTrabajo[]
+  sedes                  Sede[]
+  plataformas            PlataformaOnline[]
+  requisitos             RequisitoVoluntariado[]
+  beneficios             BeneficioVoluntariado[]
+  beneficiosParticipante BeneficioParticipante[]
+  areas                  AreaTrabajo[]
 
   @@map("configuracion_sitio")
+}
+
+model BeneficioParticipante {
+  id              String             @id @default(uuid())
+  texto           String
+  orden           Int
+  configuracion   ConfiguracionSitio @relation(fields: [configuracionId], references: [id], onDelete: Cascade)
+  configuracionId Int
+
+  @@map("beneficios_participante")
 }
 
 model Sede {

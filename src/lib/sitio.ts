@@ -32,6 +32,8 @@ export interface Site {
   socials: SiteSocials;
   requirements: string[];
   benefits: string[];
+  /** Beneficios para quienes participan de las actividades. */
+  participantBenefits: string[];
   areas: SiteArea[];
 }
 
@@ -48,6 +50,7 @@ const SITIO_RESPALDO: Site = {
   socials: respaldo.socials,
   requirements: respaldo.requirements,
   benefits: respaldo.benefits,
+  participantBenefits: [],
   areas: respaldo.areas,
 };
 
@@ -68,6 +71,7 @@ interface ConfiguracionApi {
   plataformas: { nombre: string }[];
   requisitos: { texto: string }[];
   beneficios: { texto: string }[];
+  beneficiosParticipante?: { texto: string }[];
   areas: { titulo: string; descripcion: string }[];
 }
 
@@ -97,6 +101,9 @@ export async function obtenerSitio(): Promise<Site> {
       },
       requirements: datos.requisitos.map((r) => r.texto),
       benefits: datos.beneficios.map((b) => b.texto),
+      participantBenefits: (datos.beneficiosParticipante ?? []).map(
+        (b) => b.texto,
+      ),
       areas: datos.areas.map((a) => ({
         title: a.titulo,
         description: a.descripcion,

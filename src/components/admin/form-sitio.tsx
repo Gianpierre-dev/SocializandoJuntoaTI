@@ -29,6 +29,7 @@ interface Configuracion {
   plataformas: string[];
   requisitos: string[];
   beneficios: string[];
+  beneficiosParticipante: string[];
   areas: AreaTrabajo[];
 }
 
@@ -49,6 +50,7 @@ interface ConfiguracionApi {
   plataformas: { nombre: string }[];
   requisitos: { texto: string }[];
   beneficios: { texto: string }[];
+  beneficiosParticipante: { texto: string }[];
   areas: { titulo: string; descripcion: string }[];
 }
 
@@ -173,6 +175,9 @@ export default function FormSitio() {
           plataformas: r.plataformas.map((p) => p.nombre),
           requisitos: r.requisitos.map((x) => x.texto),
           beneficios: r.beneficios.map((x) => x.texto),
+          beneficiosParticipante: (r.beneficiosParticipante ?? []).map(
+            (x) => x.texto,
+          ),
           areas: r.areas.map((a) => ({
             titulo: a.titulo,
             descripcion: a.descripcion,
@@ -220,6 +225,7 @@ export default function FormSitio() {
           plataformas: conOrden(datos.plataformas),
           requisitos: conOrden(datos.requisitos),
           beneficios: conOrden(datos.beneficios),
+          beneficiosParticipante: conOrden(datos.beneficiosParticipante),
           areas: datos.areas
             .filter((a) => a.titulo.trim())
             .map((a, indice) => ({ ...a, orden: indice + 1 })),
@@ -336,6 +342,13 @@ export default function FormSitio() {
           etiqueta="Beneficios de voluntariado"
           elementos={datos.beneficios}
           onCambio={(beneficios) => fijar({ beneficios })}
+        />
+        <ListaTextos
+          etiqueta="Beneficios para participantes"
+          elementos={datos.beneficiosParticipante}
+          onCambio={(beneficiosParticipante) =>
+            fijar({ beneficiosParticipante })
+          }
         />
 
         <div>

@@ -84,6 +84,10 @@ export interface Actividad {
   costo: string;
   modalidad: "presencial" | "online" | "mixto";
   proximamente: boolean;
+  duracion: string | null;
+  frecuencia: string | null;
+  imagenUrl: string | null;
+  textoAlternativo: string | null;
 }
 
 const MODALIDADES: Record<string, Actividad["modalidad"]> = {
@@ -104,6 +108,10 @@ export async function obtenerActividades(): Promise<Actividad[]> {
     costo: String(a.costo),
     modalidad: MODALIDADES[String(a.modalidad)] ?? "presencial",
     proximamente: a.estado === "EN_DESARROLLO",
+    duracion: (a.duracion as string) ?? null,
+    frecuencia: (a.frecuencia as string) ?? null,
+    imagenUrl: (a.imagenUrl as string) ?? null,
+    textoAlternativo: (a.textoAlternativo as string) ?? null,
   }));
 }
 

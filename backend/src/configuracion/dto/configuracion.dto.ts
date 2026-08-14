@@ -92,6 +92,12 @@ export class ActualizarConfiguracionDto {
   @Type(() => ElementoOrdenadoDto)
   beneficios!: ElementoOrdenadoDto[];
 
+  /** Beneficios para quienes participan de las actividades (no voluntarios). */
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ElementoOrdenadoDto)
+  beneficiosParticipante!: ElementoOrdenadoDto[];
+
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => AreaTrabajoDto)
