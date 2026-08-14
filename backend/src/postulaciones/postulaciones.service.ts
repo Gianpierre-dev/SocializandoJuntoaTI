@@ -1,13 +1,20 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { CorreoService } from '../correo/correo.service';
 import { CrearPostulacionDto } from './dto/postulacion.dto';
 
 @Injectable()
 export class PostulacionesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly correo: CorreoService,
+  ) {}
 
-  crear(dto: CrearPostulacionDto) {
-    return this.prisma.postulacion.create({ data: dto });
+  async crear(dto: CrearPostulacionDto) {
+    const postulacion = await this.prisma.postulacion.create({ data: dto });
+    // La notificación no bloquea la respuesta al postulante.
+    void this.correo.notificarPostulacion(postulacion);
+    return postulacion;
   }
 
   listar() {

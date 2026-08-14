@@ -16,12 +16,14 @@ import { PostulacionesModule } from './postulaciones/postulaciones.module';
 import { ConfiguracionModule } from './configuracion/configuracion.module';
 import { CifrasModule } from './cifras/cifras.module';
 import { TestimoniosModule } from './testimonios/testimonios.module';
+import { CorreoModule } from './correo/correo.module';
 import { SemillaService } from './semilla/semilla.service';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     PrismaModule,
+    CorreoModule,
     AuthModule,
     AlmacenamientoModule,
     BannersModule,
