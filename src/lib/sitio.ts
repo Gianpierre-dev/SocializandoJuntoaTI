@@ -7,6 +7,7 @@ const API_URL =
   "https://backend-production-98ca.up.railway.app";
 
 export interface SiteSocials {
+  correo: string;
   instagram: string;
   tiktok: string;
   facebook: string;
@@ -47,7 +48,7 @@ const SITIO_RESPALDO: Site = {
   objective: respaldo.objective,
   locations: respaldo.locations,
   online: respaldo.online,
-  socials: respaldo.socials,
+  socials: { correo: "", ...respaldo.socials },
   requirements: respaldo.requirements,
   benefits: respaldo.benefits,
   participantBenefits: [],
@@ -62,6 +63,7 @@ interface ConfiguracionApi {
   mision: string;
   vision: string;
   objetivo: string;
+  correo: string | null;
   instagramUrl: string | null;
   tiktokUrl: string | null;
   facebookUrl: string | null;
@@ -93,6 +95,7 @@ export async function obtenerSitio(): Promise<Site> {
       locations: datos.sedes.map((s) => s.nombre),
       online: datos.plataformas.map((p) => p.nombre),
       socials: {
+        correo: datos.correo ?? "",
         instagram: datos.instagramUrl ?? "",
         tiktok: datos.tiktokUrl ?? "",
         facebook: datos.facebookUrl ?? "",

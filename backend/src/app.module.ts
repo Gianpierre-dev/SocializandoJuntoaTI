@@ -14,6 +14,8 @@ import { AliadosModule } from './aliados/aliados.module';
 import { ValoresModule } from './valores/valores.module';
 import { PostulacionesModule } from './postulaciones/postulaciones.module';
 import { ConfiguracionModule } from './configuracion/configuracion.module';
+import { CifrasModule } from './cifras/cifras.module';
+import { TestimoniosModule } from './testimonios/testimonios.module';
 import { SemillaService } from './semilla/semilla.service';
 
 @Module({
@@ -31,6 +33,8 @@ import { SemillaService } from './semilla/semilla.service';
     ValoresModule,
     PostulacionesModule,
     ConfiguracionModule,
+    CifrasModule,
+    TestimoniosModule,
   ],
   controllers: [AppController],
   providers: [AppService, SemillaService],

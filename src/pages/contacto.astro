@@ -27,6 +27,7 @@ const socialChannels = [
 ].filter((channel) => channel.href && channel.href !== "#");
 
 const hasWhatsApp = Boolean(site.socials.whatsapp && site.socials.whatsapp !== "#");
+const tieneCorreo = Boolean(site.socials.correo);
 
 const pageTitle = `Contacto | ${site.name}`;
 const pageDescription = `Escríbenos por WhatsApp o síguenos en nuestras redes. Conoce nuestras sedes presenciales y modalidades en línea de ${site.name}.`;
@@ -79,6 +80,22 @@ const pageDescription = `Escríbenos por WhatsApp o síguenos en nuestras redes.
             )
           }
         </article>
+
+        {tieneCorreo && (
+          <article class="flex flex-col rounded-2xl border border-line bg-surface p-8">
+            <h2 class="text-2xl font-bold text-content">Correo institucional</h2>
+            <p class="mt-3 flex-1 text-base leading-relaxed text-content/70">
+              Para alianzas, invitaciones institucionales o consultas formales,
+              escríbenos por correo.
+            </p>
+            <a
+              href={`mailto:${site.socials.correo}`}
+              class="mt-6 inline-block font-semibold text-accent underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+            >
+              {site.socials.correo}
+            </a>
+          </article>
+        )}
 
         <!-- Social channels -->
         <article class="flex flex-col rounded-2xl border border-line p-8">

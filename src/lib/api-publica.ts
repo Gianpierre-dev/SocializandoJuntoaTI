@@ -181,4 +181,37 @@ export async function obtenerDonaciones(): Promise<DatosDonaciones | null> {
   return obtener<DatosDonaciones | null>("/donaciones/publica", null);
 }
 
+export interface Cifra {
+  valor: string;
+  etiqueta: string;
+}
+
+export async function obtenerCifras(): Promise<Cifra[]> {
+  const datos = await obtener<Record<string, unknown>[]>("/cifras/publicas", []);
+  return datos.map((c) => ({
+    valor: String(c.valor),
+    etiqueta: String(c.etiqueta),
+  }));
+}
+
+export interface Testimonio {
+  texto: string;
+  autor: string;
+  detalle: string | null;
+  fotoUrl: string | null;
+}
+
+export async function obtenerTestimonios(): Promise<Testimonio[]> {
+  const datos = await obtener<Record<string, unknown>[]>(
+    "/testimonios/publicos",
+    [],
+  );
+  return datos.map((t) => ({
+    texto: String(t.texto),
+    autor: String(t.autor),
+    detalle: (t.detalle as string) ?? null,
+    fotoUrl: (t.fotoUrl as string) ?? null,
+  }));
+}
+
 export const API_PUBLICA_URL = API_URL;

@@ -78,6 +78,16 @@ const currentYear = new Date().getFullYear();
         <h2 class="text-sm font-semibold uppercase tracking-wide text-white">
           Síguenos
         </h2>
+        {site.socials.correo && (
+          <p class="mt-4">
+            <a
+              href={`mailto:${site.socials.correo}`}
+              class="rounded text-sm text-white/75 transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+            >
+              {site.socials.correo}
+            </a>
+          </p>
+        )}
         {
           socialLinks.length > 0 && (
             <ul class="mt-4 space-y-2">

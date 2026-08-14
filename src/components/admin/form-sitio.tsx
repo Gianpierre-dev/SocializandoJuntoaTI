@@ -20,6 +20,7 @@ interface Configuracion {
   mision: string;
   vision: string;
   objetivo: string;
+  correo: string;
   instagramUrl: string;
   tiktokUrl: string;
   facebookUrl: string;
@@ -41,6 +42,7 @@ interface ConfiguracionApi {
   mision: string;
   vision: string;
   objetivo: string;
+  correo: string | null;
   instagramUrl: string | null;
   tiktokUrl: string | null;
   facebookUrl: string | null;
@@ -166,6 +168,7 @@ export default function FormSitio() {
           mision: r.mision,
           vision: r.vision,
           objetivo: r.objetivo,
+          correo: r.correo ?? "",
           instagramUrl: r.instagramUrl ?? "",
           tiktokUrl: r.tiktokUrl ?? "",
           facebookUrl: r.facebookUrl ?? "",
@@ -216,6 +219,7 @@ export default function FormSitio() {
           mision: datos.mision,
           vision: datos.vision,
           objetivo: datos.objetivo,
+          correo: datos.correo || undefined,
           instagramUrl: datos.instagramUrl || undefined,
           tiktokUrl: datos.tiktokUrl || undefined,
           facebookUrl: datos.facebookUrl || undefined,
@@ -293,7 +297,14 @@ export default function FormSitio() {
         />
 
         <div className="rounded-xl border border-line bg-white p-4">
-          <p className="mb-3 font-semibold text-content">Redes sociales</p>
+          <p className="mb-3 font-semibold text-content">Contacto y redes</p>
+          <div className="mb-4">
+            <Campo
+              etiqueta="Correo institucional"
+              valor={datos.correo}
+              onCambio={(v) => fijar({ correo: v })}
+            />
+          </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <Campo
               etiqueta="Instagram (URL)"

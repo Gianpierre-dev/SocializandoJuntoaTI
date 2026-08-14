@@ -32,6 +32,7 @@ export const CARPETAS_PERMITIDAS = [
   'donaciones',
   'actividades',
   'equipo',
+  'testimonios',
   'noticias',
 ] as const;
 

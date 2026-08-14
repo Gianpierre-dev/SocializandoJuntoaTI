@@ -54,6 +54,10 @@ export class ActualizarConfiguracionDto {
 
   @IsOptional()
   @IsString()
+  correo?: string;
+
+  @IsOptional()
+  @IsString()
   instagramUrl?: string;
 
   @IsOptional()

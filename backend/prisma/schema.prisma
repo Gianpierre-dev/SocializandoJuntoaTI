@@ -143,6 +143,7 @@ model ConfiguracionSitio {
   mision          String
   vision          String
   objetivo        String
+  correo          String?
   instagramUrl    String?
   tiktokUrl       String?
   facebookUrl     String?
@@ -219,6 +220,30 @@ model AreaTrabajo {
   configuracionId Int
 
   @@map("areas_trabajo")
+}
+
+model CifraImpacto {
+  id            String   @id @default(uuid())
+  valor         String
+  etiqueta      String
+  orden         Int
+  creadoEn      DateTime @default(now())
+  actualizadoEn DateTime @updatedAt
+
+  @@map("cifras_impacto")
+}
+
+model Testimonio {
+  id            String   @id @default(uuid())
+  texto         String
+  autor         String
+  detalle       String?
+  fotoUrl       String?
+  orden         Int
+  creadoEn      DateTime @default(now())
+  actualizadoEn DateTime @updatedAt
+
+  @@map("testimonios")
 }
 
 model Postulacion {
