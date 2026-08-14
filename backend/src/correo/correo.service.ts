@@ -16,6 +16,13 @@ export interface DatosPostulacion {
  * Escapa texto antes de incrustarlo en el HTML del correo: los datos vienen
  * de un formulario público y no deben poder inyectar marcado ni enlaces.
  */
+/**
+ * Quita diacríticos: el asunto viaja en una cabecera de correo y algunos
+ * proveedores no la codifican en UTF-8, mostrando caracteres rotos.
+ */
+const sinDiacriticos = (texto: string): string =>
+  texto.normalize('NFD').replace(/[̀-ͯ]/g, '');
+
 const escapar = (texto: string): string =>
   texto
     .replaceAll('&', '&amp;')
@@ -109,13 +116,14 @@ export class CorreoService {
         {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json; charset=utf-8',
             Accept: 'application/json',
             Origin: sitio,
             Referer: `${sitio}/voluntariado`,
           },
           body: JSON.stringify({
-            _subject: asunto,
+            // FormSubmit no codifica la cabecera del asunto en UTF-8.
+            _subject: sinDiacriticos(asunto),
             _template: 'table',
             _captcha: 'false',
             ...(responderA ? { email: responderA } : {}),
